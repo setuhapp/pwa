@@ -1,6 +1,6 @@
-import type { Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NavigationShim } from "@/components/NavigationShim";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import { getViewer } from "@/lib/session";
 import "./globals.css";
 
@@ -52,6 +52,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-gray-50">
         <NavigationShim tier={tier}>{children}</NavigationShim>
+        <InstallPrompt />
       </body>
     </html>
   );

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getViewer } from "@/lib/session";
 import { TiltCard } from "@/components/TiltCard";
+import { InstallButton } from "@/components/InstallButton";
 
 export default async function Home() {
   const { tier } = await getViewer();
@@ -50,6 +51,8 @@ export default async function Home() {
             Go to My Dashboard
           </Link>
         )}
+        
+        <InstallButton />
       </div>
     </main>
   );
