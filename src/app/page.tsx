@@ -1,0 +1,56 @@
+import Link from "next/link";
+import { getViewer } from "@/lib/session";
+import { TiltCard } from "@/components/TiltCard";
+
+export default async function Home() {
+  const { tier } = await getViewer();
+  const isAnon = tier === "anon";
+  const isCaregiver = tier === "caregiver";
+
+  return (
+    <main className="relative mx-auto flex min-h-screen max-w-md flex-col justify-center overflow-hidden bg-gradient-to-b from-blue-950 via-blue-950 to-blue-900 p-6 text-white">
+      {/* Decorative Blur */}
+      <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-blue-600/20 blur-[80px]" />
+      <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-brand-500/20 blur-[80px]" />
+
+      <div className="relative z-10 mb-8 flex flex-col items-center text-center">
+        <TiltCard maxRotation={20} scale={1.05} className="mb-6">
+          <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white/10 p-4 shadow-[0_0_40px_rgba(255,255,255,0.1)] backdrop-blur-md ring-1 ring-white/20">
+            <svg className="h-10 w-10 text-brand-400 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          </div>
+        </TiltCard>
+        <h1 className="text-5xl font-extrabold tracking-tight text-white drop-shadow-lg mb-2">SETUH</h1>
+        <div className="h-1 w-12 bg-brand-500 rounded-full mb-4"></div>
+        <p className="mt-2 text-lg font-medium text-blue-100/90 leading-snug">
+          Find verified, trustworthy eldercare caregivers in your city.
+        </p>
+      </div>
+
+      <div className="relative z-10 flex flex-col gap-4 mt-4">
+        {!isCaregiver && (
+          <Link href="/browse" className="group relative flex items-center justify-center overflow-hidden rounded-2xl bg-white px-4 py-4 text-center text-lg font-bold text-blue-950 shadow-[0_0_40px_rgba(255,255,255,0.15)] transition-transform active:scale-[0.98]">
+            <span className="relative z-10 flex items-center gap-2">
+              {isAnon ? "Browse Caregivers" : "Continue Browsing"}
+              <svg className="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+            </span>
+          </Link>
+        )}
+        
+        {isAnon ? (
+          <div className="grid grid-cols-2 gap-4 mt-2">
+            <Link href="/login?role=member" className="flex items-center justify-center rounded-2xl bg-white/10 px-4 py-3.5 text-sm font-semibold backdrop-blur-md ring-1 ring-white/20 transition-all hover:bg-white/20 active:scale-[0.98]">
+              Family Sign In
+            </Link>
+            <Link href="/login?role=caregiver" className="flex items-center justify-center rounded-2xl bg-white/10 px-4 py-3.5 text-sm font-semibold backdrop-blur-md ring-1 ring-white/20 transition-all hover:bg-white/20 active:scale-[0.98]">
+              Caregiver Sign In
+            </Link>
+          </div>
+        ) : (
+          <Link href={isCaregiver ? "/caregiver" : "/member"} className="flex items-center justify-center rounded-2xl bg-white/10 px-4 py-4 text-center text-lg font-semibold backdrop-blur-md ring-1 ring-white/20 transition-all hover:bg-white/20 active:scale-[0.98]">
+            Go to My Dashboard
+          </Link>
+        )}
+      </div>
+    </main>
+  );
+}

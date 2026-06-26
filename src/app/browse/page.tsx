@@ -1,0 +1,111 @@
+import { db } from "@/lib/db";
+import { getViewer } from "@/lib/session";
+import { applyCap } from "@/lib/browse";
+import { getViewed } from "@/lib/browseSession";
+import { toPublicCaregiver, toFullCaregiver } from "@/lib/serializers";
+import { ProfileCard } from "@/components/ProfileCard";
+import { SubscribePrompt } from "@/components/SubscribePrompt";
+import { RecordViews } from "@/components/RecordViews";
+import { CITIES, SPECIALISATIONS } from "@/lib/constants";
+
+export default async function BrowsePage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
+  const { session, tier } = await getViewer();
+  const params = await searchParams;
+  const viewedIds = await getViewed();
+
+  // Filters
+  const city = params.city;
+  const specialisation = params.specialisation;
+  const skill = params.skill;
+  const availability = params.availability;
+
+  const where: any = { isHidden: false };
+  if (city) where.city = city;
+  if (availability) where.availability = availability;
+  if (specialisation) where.specialisations = { contains: specialisation };
+  if (skill) where.skills = { contains: skill };
+
+  const rawCaregivers = await db.caregiver.findMany({
+    where,
+    orderBy: { experienceYears: "desc" },
+  });
+
+  const orderedIds = rawCaregivers.map((c) => c.id);
+  const { visibleIds, capped } = applyCap(orderedIds, tier, viewedIds);
+
+  const visibleCaregivers = rawCaregivers.filter((c) => visibleIds.includes(c.id));
+  const serialized = visibleCaregivers.map((c) => (tier === "anon" ? toPublicCaregiver(c) : toFullCaregiver(c)));
+
+  return (
+    <main className="relative mx-auto flex min-h-screen max-w-md flex-col bg-slate-50 pb-24">
+      {/* Dark Hero Background */}
+      <div className="absolute inset-x-0 top-0 h-[340px] bg-gradient-to-b from-blue-950 via-blue-900 to-slate-50 rounded-b-[3rem] shadow-sm" />
+
+      <div className="relative z-10 flex flex-col gap-6 p-6 pt-12">
+        <div className="mb-2 text-center text-white drop-shadow-md">
+          <h1 className="text-4xl font-extrabold tracking-tight">Discover</h1>
+          <p className="mt-2 text-sm font-medium text-slate-300">Find the perfect caregiver for your loved ones.</p>
+        </div>
+        
+        <form className="flex flex-col gap-4 rounded-3xl border border-white/40 bg-white/80 p-5 shadow-2xl backdrop-blur-xl ring-1 ring-black/5">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">City</label>
+              <div className="relative">
+                <select name="city" defaultValue={city || ""} className="w-full appearance-none rounded-xl border border-white/50 bg-white/50 py-3 pl-3 pr-8 text-base font-semibold text-slate-800 outline-none backdrop-blur-sm transition-all focus:bg-white focus:ring-2 focus:ring-slate-900 sm:text-sm shadow-sm">
+                  <option value="">Anywhere</option>
+                  {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Specialty</label>
+              <div className="relative">
+                <select name="specialisation" defaultValue={specialisation || ""} className="w-full appearance-none rounded-xl border border-white/50 bg-white/50 py-3 pl-3 pr-8 text-base font-semibold text-slate-800 outline-none backdrop-blur-sm transition-all focus:bg-white focus:ring-2 focus:ring-slate-900 sm:text-sm shadow-sm">
+                  <option value="">Any</option>
+                  {SPECIALISATIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Keyword</label>
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <input name="skill" placeholder="Search skills..." defaultValue={skill || ""} className="w-full appearance-none rounded-xl border border-white/50 bg-white/50 py-3 pl-10 pr-4 text-base font-semibold text-slate-800 outline-none backdrop-blur-sm transition-all focus:bg-white focus:ring-2 focus:ring-slate-900 sm:text-sm shadow-sm" />
+            </div>
+          </div>
+
+          <button type="submit" className="mt-2 w-full rounded-xl bg-blue-600 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/20 transition-all duration-300 hover:bg-blue-700 hover:shadow-blue-600/40 active:scale-[0.98]">
+            Apply Filters
+          </button>
+        </form>
+
+        <div className="flex flex-col gap-5 mt-2">
+          {tier === "anon" && <RecordViews ids={visibleIds} />}
+          {serialized.map((cg) => (
+            <ProfileCard key={cg.id} caregiver={cg} />
+          ))}
+          {serialized.length === 0 && (
+            <div className="py-12 text-center rounded-3xl bg-white/50 backdrop-blur-sm border border-white p-6 shadow-sm">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 shadow-inner">
+                <svg className="h-8 w-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900">No caregivers found</h3>
+              <p className="mt-1 text-sm font-medium text-slate-500">Try adjusting your filters to see more results.</p>
+            </div>
+          )}
+        </div>
+
+        {capped && <div className="mt-4"><SubscribePrompt /></div>}
+      </div>
+    </main>
+  );
+}

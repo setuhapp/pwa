@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Models added per-milestone below.
+
+model Caregiver {
+  id              String   @id @default(cuid())
+  phone           String   @unique
+  name            String?
+  photoUrl        String?
+  address         String?
+  city            String?
+  qualifications  String?
+  skills          String?  // JSON array
+  experienceYears Int?
+  priorFamilies   String?
+  specialisations String?  // JSON array
+  availability    String?  // live-in | part-time
+  dailyRate       Int?
+  monthlyRate     Int?
+  isHidden        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  verifications   Verification[]
+  engagements     Engagement[]
+  bookmarks       Bookmark[]
+}
+
+model Member {
+  id                 String   @id @default(cuid())
+  phone              String   @unique
+  name               String?
+  subscriptionStatus String   @default("none") // none | active
+  subscriptionExpiry DateTime?
+  careNeed           String?  // JSON
+  createdAt          DateTime @default(now())
+  engagements        Engagement[]
+  bookmarks          Bookmark[]
+}
+
+model Admin {
+  id    String @id @default(cuid())
+  phone String @unique
+  name  String?
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userType  String   // caregiver | member | admin
+  userId    String
+  createdAt DateTime @default(now())
+}
+
+model Verification {
+  id          String    @id @default(cuid())
+  caregiverId String
+  caregiver   Caregiver @relation(fields: [caregiverId], references: [id])
+}
+
+model Engagement {
+  id          String    @id @default(cuid())
+  caregiverId String
+  memberId    String
+  caregiver   Caregiver @relation(fields: [caregiverId], references: [id])
+  member      Member    @relation(fields: [memberId], references: [id])
+}
+
+model Bookmark {
+  id          String    @id @default(cuid())
+  memberId    String
+  caregiverId String
+  member      Member    @relation(fields: [memberId], references: [id])
+  caregiver   Caregiver @relation(fields: [caregiverId], references: [id])
+}
