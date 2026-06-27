@@ -28,6 +28,7 @@ model Caregiver {
   verifications   Verification[]
   engagements     Engagement[]
   bookmarks       Bookmark[]
+  messages        Message[]
 }
 
 model Member {
@@ -40,6 +41,7 @@ model Member {
   createdAt          DateTime @default(now())
   engagements        Engagement[]
   bookmarks          Bookmark[]
+  messages           Message[]
 }
 
 model Admin {
@@ -74,6 +76,17 @@ model Bookmark {
   id          String    @id @default(cuid())
   memberId    String
   caregiverId String
+  member      Member    @relation(fields: [memberId], references: [id])
+  caregiver   Caregiver @relation(fields: [caregiverId], references: [id])
+}
+
+model Message {
+  id          String    @id @default(cuid())
+  memberId    String
+  caregiverId String
+  content     String
+  sender      String    // "member" | "caregiver"
+  createdAt   DateTime  @default(now())
   member      Member    @relation(fields: [memberId], references: [id])
   caregiver   Caregiver @relation(fields: [caregiverId], references: [id])
 }

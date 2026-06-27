@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { db } from "@/lib/db";
 import { getViewer } from "@/lib/session";
 import { parseStringArray } from "@/lib/json";
@@ -76,17 +77,17 @@ export default async function PublicProfile({
               </div>
             </div>
             
-            {/* WhatsApp CTA */}
+            {/* Message CTA */}
             {canSeeDetails && (cg as Caregiver).phone && (
-              <a 
-                href={`https://wa.me/91${(cg as Caregiver).phone}?text=Hi, I found your profile on SETUH and would like to discuss a care requirement.`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 py-3.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(37,211,102,0.39)] transition-transform active:scale-[0.98] hover:bg-[#20bd5a]"
-              >
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 0C5.385 0 0 5.385 0 12.031c0 2.648.85 5.148 2.398 7.215L.823 24l4.908-1.545c2.015 1.455 4.416 2.227 6.953 2.227 6.646 0 12.031-5.385 12.031-12.031S18.677 0 12.031 0zm0 22.511c-2.226 0-4.417-.597-6.326-1.728l-.454-.27-3.649 1.15.975-3.553-.296-.47C1.107 15.655.453 13.865.453 12.031c0-6.398 5.203-11.601 11.578-11.601 6.375 0 11.601 5.203 11.601 11.601 0 6.398-5.226 11.601-11.601 11.601zM18.4 15.95c-.328-.164-1.922-.953-2.227-1.055-.305-.101-.527-.164-.738.164-.223.328-.856 1.055-1.043 1.277-.188.223-.387.246-.715.082-.328-.164-1.375-.508-2.613-1.617-.961-.867-1.605-1.93-1.793-2.258-.188-.328-.02-.504.145-.668.148-.148.328-.387.492-.574.164-.199.223-.328.328-.551.101-.223.05-.422-.03-.586-.082-.164-.738-1.781-1.008-2.438-.27-.644-.54-.55-.738-.562-.188-.012-.41-.012-.633-.012-.223 0-.586.082-.89.41-.305.328-1.16 1.137-1.16 2.766 0 1.629 1.183 3.211 1.352 3.434.164.223 2.344 3.578 5.672 5.016 3.328 1.437 3.328.961 3.926.89.586-.07 1.922-.785 2.191-1.547.27-.762.27-1.418.188-1.547-.082-.13-.305-.203-.633-.367z"/></svg>
-                Message on WhatsApp
-              </a>
+              <div className="mt-2 flex w-full">
+                <Link 
+                  href={`/messages/${rawCg.id}`}
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-4 py-3.5 text-sm font-bold text-white shadow-md transition-transform active:scale-[0.98] hover:bg-brand-700"
+                >
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                  Message in App
+                </Link>
+              </div>
             )}
           </>
         ) : (
@@ -104,9 +105,9 @@ export default async function PublicProfile({
               {cg.city && <p className="mt-1 text-sm font-medium text-gray-500">{cg.city}</p>}
             </div>
 
-            <a href="/login?role=member" className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-4 py-3.5 text-sm font-bold text-white shadow-md transition-transform active:scale-[0.98] hover:bg-brand-700">
+            <Link href={!session ? "/login?role=member" : "/member/subscribe"} className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-4 py-3.5 text-sm font-bold text-white shadow-md transition-transform active:scale-[0.98] hover:bg-brand-700">
               Subscribe to View & Message
-            </a>
+            </Link>
           </>
         )}
       </section>

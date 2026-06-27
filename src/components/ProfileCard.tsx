@@ -17,7 +17,7 @@ export function ProfileCard({ caregiver }: { caregiver: PublicCaregiver | Caregi
               <img src={(caregiver as Caregiver).photoUrl!} alt="Profile" className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
             ) : (
               <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-blue-950 via-slate-800 to-slate-900">
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+                <div className="absolute inset-0 bg-gray-200 opacity-20 mix-blend-normal"></div>
                 <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm">
                   <svg className="h-6 w-6 text-white/80 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                 </div>

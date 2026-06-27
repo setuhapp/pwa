@@ -21,6 +21,7 @@ export async function login(formData: FormData) {
   } else if (role === "admin") {
     const a = await db.admin.upsert({ where: { phone }, update: {}, create: { phone } });
     await createSession("admin", a.id);
+    redirect("/admin");
   } else {
     const m = await db.member.upsert({ where: { phone }, update: {}, create: { phone } });
     await createSession("member", m.id);

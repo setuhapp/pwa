@@ -6,7 +6,12 @@ import { tierFromSession, type SessionInfo, type Tier } from "@/lib/viewer";
 export async function createSession(userType: "caregiver" | "member" | "admin", userId: string) {
   const token = crypto.randomUUID();
   await db.session.create({ data: { token, userType, userId } });
-  (await cookies()).set(SESSION_COOKIE, token, { httpOnly: true, sameSite: "lax", path: "/" });
+  (await cookies()).set(SESSION_COOKIE, token, { 
+    httpOnly: true, 
+    sameSite: "lax", 
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+  });
 }
 
 export async function destroySession() {

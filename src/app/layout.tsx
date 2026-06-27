@@ -26,7 +26,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "SETUH",
-  description: "Find verified eldercare caregivers you can trust.",
+  description: "Find Verified Elder Caregivers You Can Trust.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
@@ -43,7 +43,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { tier } = await getViewer();
+  const { session, tier } = await getViewer();
   
   return (
     <html
@@ -51,7 +51,7 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-gray-50">
-        <NavigationShim tier={tier}>{children}</NavigationShim>
+        <NavigationShim tier={tier} userType={session?.userType ?? null}>{children}</NavigationShim>
         <InstallPrompt />
       </body>
     </html>

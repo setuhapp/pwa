@@ -53,6 +53,15 @@ export default async function Home() {
         )}
         
         <InstallButton />
+
+        <div className="mt-4 flex justify-center">
+          <Link
+            href="/admin"
+            className="text-xs font-medium text-blue-200/50 hover:text-blue-200 transition-colors py-2 px-4 rounded-xl hover:bg-white/5 active:scale-[0.98] transition-all"
+          >
+            Admin Portal &rarr;
+          </Link>
+        </div>
       </div>
     </main>
   );

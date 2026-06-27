@@ -97,4 +97,4 @@ OTP `000000` to log in.
 4. Vercel will automatically build the Next.js app and run the required Prisma
    generations.
 
-npm run build && npx next start -p 3001
+PWA : npm run build && npx next start -p 3001
