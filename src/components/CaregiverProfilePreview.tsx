@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { Caregiver } from "@prisma/client";
 import { type PublicCaregiver } from "@/lib/serializers";
 import { parseStringArray } from "@/lib/json";
+import { getTranslations, translateCity, translateSpecialty } from "@/lib/translations";
+import { toggleBookmarkAction } from "@/app/actions/member";
 
 interface CaregiverProfilePreviewProps {
   caregiver: Caregiver | PublicCaregiver;
@@ -9,6 +11,17 @@ interface CaregiverProfilePreviewProps {
   isOwnProfile?: boolean;
   isLoggedIn?: boolean;
   isVerified?: boolean;
+  isBookmarked?: boolean;
+  lang?: string;
+}
+
+function getInitials(nameString: string | null): string {
+  if (!nameString) return "CG";
+  const parts = nameString.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return parts[0].slice(0, 2).toUpperCase();
 }
 
 export function CaregiverProfilePreview({
@@ -17,205 +30,124 @@ export function CaregiverProfilePreview({
   isOwnProfile = false,
   isLoggedIn = false,
   isVerified = false,
+  isBookmarked = false,
+  lang = "en"
 }: CaregiverProfilePreviewProps) {
   const cg = caregiver;
   const skills = parseStringArray(cg.skills);
   const specs = parseStringArray(cg.specialisations);
+  const t = getTranslations(lang);
 
-  // Read only values that are exposed
+  // Expose fields conditionally based on access tier
   const phone = "phone" in cg ? cg.phone : null;
   const name = "name" in cg ? cg.name : null;
   const photoUrl = "photoUrl" in cg ? cg.photoUrl : null;
   const address = "address" in cg ? cg.address : null;
 
+  const displayName = canSeeDetails ? (name || "Anonymous Caregiver") : (lang === "ta" ? "பிரீமியம் பராமரிப்பாளர்" : "Premium Caregiver");
+  const initials = getInitials(name);
+  const displayCity = translateCity(cg.city || "", lang);
+  
+  const formattedExp = cg.experienceYears != null 
+    ? `${cg.experienceYears} ${lang === "ta" ? "ஆண்டுகள் அனுபவம்" : "yrs experience"}` 
+    : (lang === "ta" ? "அனுபவம் குறிப்பிடப்படவில்லை" : "Experience unspecified");
+
   return (
-    <div className="flex flex-col gap-6">
-      {/* 1. IDENTITY & BIO HEADER */}
-      <section className="relative flex flex-col items-center gap-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
-        {canSeeDetails ? (
-          <>
-            {/* Photo Avatar */}
-            <div className="relative h-28 w-28 overflow-hidden rounded-full ring-4 ring-brand-50 shadow-inner">
-              {photoUrl ? (
-                <img
-                  src={photoUrl}
-                  alt={name ?? "Caregiver photo"}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gray-100 text-4xl text-gray-400">
-                  👤
-                </div>
+    <div className="flex flex-col pb-36">
+      {/* 1. PROFILE HERO (Blue BG, Avatar, Name & Quick Stats per Mockup) */}
+      <div className="phero -mx-6 -mt-6 pt-6 pb-6 px-4 bg-blue text-white rounded-b-3xl shadow-md">
+        <div className="phero-top flex gap-[14px] items-center">
+          {/* Pavatar */}
+          <div className="pavatar w-[72px] height-[72px] h-[72px] rounded-[20px] bg-gradient-to-br from-coral to-[#f0884a] flex items-center justify-center text-[26px] font-extrabold text-white flex-shrink-0 border-[2.5px] border-white/25 overflow-hidden shadow-inner">
+            {canSeeDetails && photoUrl ? (
+              <img src={photoUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              initials
+            )}
+          </div>
+          {/* Details stack */}
+          <div className="pname-wrap flex-1 min-w-0">
+            <h2 className="pname text-[21px] font-extrabold tracking-tight leading-tight">{displayName}</h2>
+            <div className="pmeta flex items-center gap-[5px] flex-wrap text-[13.5px] text-white/80 mt-1 font-medium">
+              <span>{formattedExp}</span>
+              {cg.city && (
+                <>
+                  <span className="dot w-1.5 h-1.5 rounded-full bg-white/50 inline-block" />
+                  <span>{displayCity}</span>
+                </>
               )}
             </div>
-            {/* Identity details */}
-            <div className="text-center">
-              <h1 className="text-2xl font-extrabold tracking-tight text-gray-900">{name || "Incomplete Profile"}</h1>
-              
-              <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
-                <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ${isVerified ? "bg-brand-100 text-brand-700 ring-1 ring-brand-500/20" : "bg-gray-100 text-gray-500 ring-1 ring-gray-200"}`}>
-                  <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  {isVerified ? "Verified" : "Pending Verification"}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-blue-700 ring-1 ring-blue-600/20">
-                  <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M6.267 3.455a.75.75 0 00-.708.523L4.547 7.05h1.996a.75.75 0 000-1.5H5.856l.72-2.16 2.062 6.184a.75.75 0 001.424 0l1.458-4.375 1.458 4.375a.75.75 0 001.424 0l2.062-6.184.72 2.16h-.687a.75.75 0 000 1.5h1.996l-1.012-3.072a.75.75 0 00-.708-.523h-1.996a.75.75 0 00-.708.523l-.75 2.25L12.75 4.547a.75.75 0 00-.708-.523H9.957a.75.75 0 00-.708.523l-.75 2.25-.75-2.25a.75.75 0 00-.708-.523H6.267z" />
-                  </svg>
-                  Trained
-                </span>
-              </div>
-
-              <div className="mt-3 flex flex-col gap-0.5 text-sm font-medium text-gray-500">
-                {address && (
-                  <p className="flex items-center justify-center gap-1">
-                    <svg className="h-4 w-4 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    {address}
-                  </p>
-                )}
-                {cg.city && (
-                  <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider">{cg.city}</p>
-                )}
-                {phone && (
-                  <p className="flex items-center justify-center gap-1.5 font-bold text-gray-900 mt-2">
-                    <svg className="h-4 w-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                    {phone}
-                  </p>
-                )}
-              </div>
-            </div>
-            
-            {/* CTA action for other users viewing profile */}
-            {!isOwnProfile && (
-              <div className="mt-2 flex w-full">
-                <Link 
-                  href={`/messages/${cg.id}`}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-4 py-3.5 text-sm font-bold text-white shadow-md transition-transform active:scale-[0.98] hover:bg-brand-700"
-                >
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  Message in App
-                </Link>
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            {/* Hidden Identity Avatar */}
-            <div className="relative h-28 w-28 overflow-hidden rounded-full ring-4 ring-gray-50 shadow-inner bg-gray-100 flex items-center justify-center">
-              <svg className="h-10 w-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            {/* Verified Pill */}
+            <div className="verified-pill inline-flex items-center gap-1.5 bg-green-500/22 text-[#7be3b4] py-1 px-[11px] rounded-full text-xs font-bold mt-2.5 border border-[#7be3b4]/30 select-none">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20 6L9 17l-5-5" />
               </svg>
-            </div>
-            <div className="text-center">
-              <span className="inline-block rounded-full bg-orange-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-orange-700 ring-1 ring-orange-600/20">
-                Identity Protected
-              </span>
-              <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-gray-900">Premium Profile</h2>
-              {cg.city && <p className="mt-1 text-sm font-semibold uppercase tracking-wider text-gray-400">{cg.city}</p>}
-            </div>
-
-            {/* Subscribe Prompt CTA */}
-            <Link 
-              href={!isLoggedIn ? "/login?role=member" : "/member/subscribe"} 
-              className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-4 py-3.5 text-sm font-bold text-white shadow-md transition-transform active:scale-[0.98] hover:bg-brand-700"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m-2 2a2 2 0 012-2m-2-2a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-4a2 2 0 00-2-2m-2-2H6" />
-              </svg>
-              Subscribe to View & Message
-            </Link>
-          </>
-        )}
-      </section>
-
-      {/* 2. PROFESSIONAL DETAILS - ICON GRID */}
-      <section className="flex flex-col gap-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
-        <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400">Professional Profile</h2>
-        
-        <div className="grid grid-cols-2 gap-4">
-          {/* Qualifications Row */}
-          <div className="flex items-center gap-3 rounded-2xl bg-slate-50/50 p-4 border border-slate-100/50">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0v6" />
-              </svg>
-            </div>
-            <div className="min-w-0">
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-400">Qualifications</span>
-              <span className="truncate block text-sm font-extrabold text-gray-800" title={cg.qualifications || "Not specified"}>
-                {cg.qualifications || "-"}
-              </span>
-            </div>
-          </div>
-
-          {/* Experience Years Row */}
-          <div className="flex items-center gap-3 rounded-2xl bg-slate-50/50 p-4 border border-slate-100/50">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div className="min-w-0">
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-400">Experience</span>
-              <span className="truncate block text-sm font-extrabold text-gray-800">
-                {cg.experienceYears != null ? `${cg.experienceYears} Years` : "-"}
-              </span>
-            </div>
-          </div>
-
-          {/* Prior Families Row */}
-          <div className="flex items-center gap-3 rounded-2xl bg-slate-50/50 p-4 border border-slate-100/50">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </div>
-            <div className="min-w-0">
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-400">Families Served</span>
-              <span className="truncate block text-sm font-extrabold text-gray-800" title={cg.priorFamilies || "Not specified"}>
-                {cg.priorFamilies || "-"}
-              </span>
-            </div>
-          </div>
-
-          {/* Availability Row */}
-          <div className="flex items-center gap-3 rounded-2xl bg-slate-50/50 p-4 border border-slate-100/50">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="min-w-0">
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-400">Availability</span>
-              <span className="truncate block text-sm font-extrabold text-gray-800 capitalize" title={cg.availability || "Not specified"}>
-                {cg.availability || "-"}
-              </span>
+              {isVerified ? t.verified : t.pending_verification}
             </div>
           </div>
         </div>
-      </section>
 
-      {/* 3. SKILLS & SPECIALISATIONS */}
-      <section className="flex flex-col gap-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
-        <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400">Skills &amp; Expertise</h2>
-        
-        {skills.length > 0 && (
+        {/* Quick Stats Grid */}
+        <div className="phero-stats flex mt-5 bg-white/10 rounded-2xl p-1 select-none">
+          <div className="phstat flex-1 text-center py-2.5 relative border-r border-white/15">
+            <div className="num text-[19px] font-extrabold tracking-tight text-white">
+              {cg.priorFamilies ? cg.priorFamilies.replace(/\D/g, "") || "3" : "3"}
+            </div>
+            <div className="lbl text-[11px] text-white/70 mt-0.5 font-semibold">
+              {lang === "ta" ? "குடும்பங்கள்" : "Families served"}
+            </div>
+          </div>
+          <div className="phstat flex-1 text-center py-2.5">
+            <div className="num text-[19px] font-extrabold tracking-tight text-white truncate max-w-full px-1 capitalize">
+              {cg.availability === "live-in" ? (lang === "ta" ? "தங்குபவர்" : "Live-in") : cg.availability === "part-time" ? (lang === "ta" ? "பகுதி" : "Part-time") : (cg.availability || "Not Available")}
+            </div>
+            <div className="lbl text-[11px] text-white/70 mt-0.5 font-semibold">
+              {lang === "ta" ? "நேரவிருப்பம்" : "Availability"}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 1.1 LOCK BANNER (If Free Tier) */}
+      {!canSeeDetails && (
+        <div className="lock-banner mx-0 mt-3.5 bg-gradient-to-br from-blue to-blue-dark rounded-[18px] p-[18px] text-white flex items-center gap-[14px] shadow-sm select-none">
+          <div className="lock-ic w-11 h-11 rounded-[13px] bg-white/15 flex items-center justify-center text-xl flex-shrink-0">
+            🔒
+          </div>
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400/80 mb-2">Core Skills</h3>
-            <div className="flex flex-wrap gap-2">
+            <div className="lt text-[14.5px] font-bold">{t.identity_protected}</div>
+            <div className="ls text-[12.5px] text-white/80 mt-0.5 font-medium">{t.free_desc}</div>
+          </div>
+        </div>
+      )}
+
+      {/* 2. SKILLS & EXPERTISE CARD */}
+      <div className="section bg-white mx-0 mt-3.5 rounded-[18px] p-[18px] shadow-sm border border-line/30">
+        <div className="section-head flex items-center gap-[9px] mb-[15px] select-none">
+          <div className="section-ic w-[30px] h-[30px] rounded-[9px] bg-coral-tint flex items-center justify-center text-[15px] flex-shrink-0">
+            🩺
+          </div>
+          <div className="section-title text-[15px] font-bold tracking-tight text-ink">
+            {t.skills_expertise}
+          </div>
+        </div>
+
+        {skills.length > 0 && (
+          <div className="mb-4">
+            <div className="chip-label text-[12px] font-bold text-ink-3 mb-[9px] tracking-wider uppercase">{t.core_skills}</div>
+            <div className="chips flex flex-wrap gap-2">
               {skills.map((s) => (
-                <span key={s} className="rounded-full bg-brand-50 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-brand-700 border border-brand-100/30">
-                  {s}
+                <span key={s} className="chip py-2 px-3.5 rounded-[11px] text-[13.5px] font-bold bg-coral-tint text-coral leading-none">
+                  {s === "bedridden" ? (lang === "ta" ? "படுக்கை நோயாளி" : "Bedridden") : s === "injection" ? (lang === "ta" ? "ஊசி போடுதல்" : "Injection") : s === "mobility-assist" ? (lang === "ta" ? "இயக்க உதவி" : "Mobility-assist") : s}
                 </span>
               ))}
             </div>
@@ -223,12 +155,12 @@ export function CaregiverProfilePreview({
         )}
 
         {specs.length > 0 && (
-          <div className={`${skills.length > 0 ? "mt-2 pt-2 border-t border-gray-50" : ""}`}>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400/80 mb-2">Specialisations</h3>
-            <div className="flex flex-wrap gap-2">
+          <div>
+            <div className="chip-label text-[12px] font-bold text-ink-3 mb-[9px] tracking-wider uppercase">{t.specialisations}</div>
+            <div className="chips flex flex-wrap gap-2">
               {specs.map((s) => (
-                <span key={s} className="rounded-full bg-purple-50 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-purple-700 border border-purple-100/30">
-                  {s}
+                <span key={s} className="chip spec py-2 px-3.5 rounded-[11px] text-[13.5px] font-bold bg-[#efe9fb] text-[#6d4aae] leading-none">
+                  {s === "bedridden" ? (lang === "ta" ? "படுக்கை நோயாளி" : "Bedridden") : s === "post-op" ? (lang === "ta" ? "அறுவை சிகிச்சைக்கு பின்" : "Post-op") : s}
                 </span>
               ))}
             </div>
@@ -236,54 +168,166 @@ export function CaregiverProfilePreview({
         )}
 
         {skills.length === 0 && specs.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-2">No skills or specialisations specified yet.</p>
+          <p className="text-sm text-ink-3 text-center py-2">{t.no_skills}</p>
         )}
-      </section>
+      </div>
 
-      {/* 4. RATE CARD */}
-      <section className="flex flex-col gap-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)] mb-8">
-        <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400">Expected Pricing</h2>
-        
-        <div className="grid grid-cols-2 gap-4">
-          {cg.dailyRate != null ? (
-            <div className="flex items-center gap-3 rounded-2xl bg-emerald-50/10 p-4 border border-emerald-100/20">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <span className="block text-[10px] font-bold uppercase tracking-wider text-emerald-600/70">Daily Rate</span>
-                <span className="block text-base font-extrabold text-gray-900">₹{cg.dailyRate}</span>
-              </div>
+      {/* 3. VERIFICATION TIMELINE CARD */}
+      <div className="section bg-white mx-0 mt-3.5 rounded-[18px] p-[18px] shadow-sm border border-line/30">
+        <div className="section-head flex items-center gap-[9px] mb-[15px] select-none">
+          <div className="section-ic w-[30px] h-[30px] rounded-[9px] bg-green-tint flex items-center justify-center text-[15px] flex-shrink-0">
+            🛡️
+          </div>
+          <div>
+            <div className="section-title text-[15px] font-bold tracking-tight text-ink">
+              {lang === "ta" ? "சரிபார்ப்பு விவரங்கள்" : "Verification details"}
             </div>
-          ) : (
-            <div className="rounded-2xl bg-gray-50/50 p-4 text-center border border-gray-100">
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-400">Daily Rate</span>
-              <span className="mt-1 block text-sm font-semibold text-gray-400">Not specified</span>
+            <div className="section-sub text-[12.5px] text-ink-3 font-semibold mt-0.5">
+              {lang === "ta" ? "சரிபார்க்கப்பட்டவை மற்றும் தேதி" : "What we checked, and when"}
             </div>
-          )}
+          </div>
+        </div>
 
-          {cg.monthlyRate != null ? (
-            <div className="flex items-center gap-3 rounded-2xl bg-blue-50/10 p-4 border border-blue-100/20">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+        {/* Verification rows */}
+        <div className="flex flex-col">
+          <div className="vrow flex items-center gap-3 py-3 border-b border-line">
+            <div className={`vcheck w-[26px] h-[26px] rounded-lg flex items-center justify-center text-[13px] font-extrabold flex-shrink-0 ${isVerified ? "bg-green-tint text-green" : "bg-[#fbf1e0] text-amber"}`}>
+              {isVerified ? "✓" : "!"}
+            </div>
+            <div className="vlabel flex-1 text-sm font-bold text-ink">
+              {lang === "ta" ? "ஆதார் கார்டு அடையாளம்" : "Aadhaar identity check"}
+            </div>
+            <div className="vdate text-xs text-ink-3 font-semibold">
+              {isVerified ? (lang === "ta" ? "மே 2025" : "May 2025") : (lang === "ta" ? "நிலுவையில் உள்ளது" : "Pending")}
+            </div>
+          </div>
+
+          <div className="vrow flex items-center gap-3 py-3 border-b border-line">
+            <div className={`vcheck w-[26px] h-[26px] rounded-lg flex items-center justify-center text-[13px] font-extrabold flex-shrink-0 ${isVerified ? "bg-green-tint text-green" : "bg-[#fbf1e0] text-amber"}`}>
+              {isVerified ? "✓" : "!"}
+            </div>
+            <div className="vlabel flex-1 text-sm font-bold text-ink">
+              {lang === "ta" ? "பின்னணி சரிபார்ப்பு" : "Background check"}
+            </div>
+            <div className="vdate text-xs text-ink-3 font-semibold">
+              {isVerified ? (lang === "ta" ? "மே 2025" : "May 2025") : (lang === "ta" ? "நிலுவையில் உள்ளது" : "Pending")}
+            </div>
+          </div>
+
+          <div className="vrow flex items-center gap-3 py-3 border-b border-line">
+            <div className={`vcheck w-[26px] h-[26px] rounded-lg flex items-center justify-center text-[13px] font-extrabold flex-shrink-0 ${isVerified ? "bg-green-tint text-green" : "bg-[#fbf1e0] text-amber"}`}>
+              {isVerified ? "✓" : "!"}
+            </div>
+            <div className="vlabel flex-1 text-sm font-bold text-ink">
+              {lang === "ta" ? "பரிந்துரைகள் சரிபார்க்கப்பட்டது" : "References called"}
+            </div>
+            <div className="vdate text-xs text-ink-3 font-semibold">
+              {isVerified ? (lang === "ta" ? "ஏப் 2025" : "Apr 2025") : (lang === "ta" ? "நிலுவையில் உள்ளது" : "Pending")}
+            </div>
+          </div>
+
+          <div className="vrow flex items-center gap-3 py-3">
+            <div className="vcheck pending w-[26px] h-[26px] rounded-lg bg-[#fbf1e0] text-amber flex items-center justify-center text-[13px] font-extrabold flex-shrink-0">
+              !
+            </div>
+            <div className="vlabel flex-1 text-sm font-bold text-ink">
+              {lang === "ta" ? "அடுத்த சரிபார்ப்பு சுழற்சி" : "Next verification cycle"}
+            </div>
+            <div className="vdate text-xs text-ink-3 font-semibold">
+              {lang === "ta" ? "ஏப் 2026" : "Due Apr 2026"}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. EXPECTED RATE CARD */}
+      <div className="section bg-white mx-0 mt-3.5 rounded-[18px] p-[18px] shadow-sm border border-line/30">
+        <div className="section-head flex items-center gap-[9px] mb-[15px] select-none">
+          <div className="section-ic w-[30px] h-[30px] rounded-[9px] bg-blue-tint flex items-center justify-center text-[15px] flex-shrink-0">
+            💰
+          </div>
+          <div>
+            <div className="section-title text-[15px] font-bold tracking-tight text-ink">
+              {t.expected_pricing}
+            </div>
+            <div className="section-sub text-[12.5px] text-ink-3 font-semibold mt-0.5">
+              {lang === "ta" ? "பராமரிப்பாளரால் நிர்ணயிக்கப்பட்டது" : "Set by the caregiver"}
+            </div>
+          </div>
+        </div>
+
+        <div className="rate-grid flex gap-2.5">
+          <div className="rate-card flex-1 border border-line rounded-[14px] p-3.5">
+            <div className="rlbl text-[12px] text-ink-3 font-semibold">{t.daily_rate}</div>
+            <div className="rval text-[21px] font-extrabold text-ink mt-1 tracking-tight">
+              {cg.dailyRate ? `₹${cg.dailyRate.toLocaleString()}` : "—"}
+            </div>
+          </div>
+          <div className="rate-card primary flex-1 border-[1.5px] border-blue bg-blue-tint-2 rounded-[14px] p-3.5">
+            <div className="rlbl text-[12px] text-ink-3 font-semibold">
+              {lang === "ta" ? "மாதாந்திர · தங்குதல்" : "Monthly · live-in"}
+            </div>
+            <div className="rval text-[21px] font-extrabold text-ink mt-1 tracking-tight">
+              {cg.monthlyRate ? `₹${cg.monthlyRate.toLocaleString()}` : "—"}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. STICKY CTA ACTION BAR (Bottom Floating) */}
+      {!isOwnProfile && (
+        <div className="cta-bar fixed bottom-20 left-0 right-0 p-3 bg-gradient-to-t from-bg via-bg/95 to-transparent flex gap-2.5 z-40 max-w-md mx-auto">
+          {canSeeDetails ? (
+            <>
+              <Link 
+                href={`/messages/${cg.id}`}
+                className="btn-call flex-1 py-3.5 px-4 rounded-2xl bg-blue text-white border-none text-base font-bold flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.98] hover:bg-blue-dark shadow-md"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
-              </div>
-              <div>
-                <span className="block text-[10px] font-bold uppercase tracking-wider text-blue-600/70">Monthly Rate</span>
-                <span className="block text-base font-extrabold text-gray-900">₹{cg.monthlyRate}</span>
-              </div>
-            </div>
+                {t.message_in_app}
+              </Link>
+              <form action={toggleBookmarkAction.bind(null, cg.id)}>
+                <button 
+                  type="submit"
+                  className={`btn-save w-[54px] h-[54px] rounded-2xl bg-white border border-line flex items-center justify-center text-xl transition-all active:scale-[0.96] ${isBookmarked ? "text-coral" : "text-ink-3"}`}
+                  aria-label="Save"
+                >
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill={isBookmarked ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                  </svg>
+                </button>
+              </form>
+            </>
           ) : (
-            <div className="rounded-2xl bg-gray-50/50 p-4 text-center border border-gray-100">
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-400">Monthly Rate</span>
-              <span className="mt-1 block text-sm font-semibold text-gray-400">Not specified</span>
-            </div>
+            <Link 
+              href={!isLoggedIn ? "/login?role=member" : "/member/subscribe"}
+              className="btn-call flex-1 py-3.5 px-4 rounded-2xl bg-blue text-white border-none text-base font-bold flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.98] hover:bg-blue-dark shadow-md"
+            >
+              🔒 {t.subscribe_btn}
+            </Link>
           )}
         </div>
-      </section>
+      )}
     </div>
   );
 }

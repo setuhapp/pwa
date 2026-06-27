@@ -20,7 +20,7 @@ export default async function MemberSettingsPage() {
   const isSubscribed = tier === "member";
 
   return (
-    <main className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-md flex-col gap-6 p-6">
+    <main className="mx-auto flex max-w-md flex-col gap-6 p-6 pb-24">
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Settings</h1>
         <p className="text-sm font-medium text-gray-500">Manage your family account</p>
@@ -62,7 +62,7 @@ export default async function MemberSettingsPage() {
       </section>
 
       {/* Logout Action */}
-      <div className="mt-auto pt-8">
+      <div className="mt-4">
         <form action={logout}>
           <button className="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50/50 px-4 py-4 text-base font-bold text-red-600 shadow-sm transition-transform active:scale-[0.98] hover:bg-red-50 hover:text-red-700">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,43 +1,109 @@
 @import "tailwindcss";
 
+html {
+  font-size: 18px;
+}
+
 :root {
-  --background: #F8FAFC;
-  --foreground: #0F172A;
+  --background: #f6f8f8;
+  --foreground: #14242b;
+  
+  --blue: #0f2b5c;
+  --blue-dark: #071938;
+  --blue-tint: #eef3fc;
+  --blue-tint-2: #f7faff;
+  --coral: #e8663d;
+  --coral-tint: #fdeee9;
+  --amber: #e8a23d;
+  --green: #2d9e6f;
+  --green-tint: #e6f4ee;
+  --ink: #14242b;
+  --ink-2: #4a5c63;
+  --ink-3: #8595a0;
+  --line: #e8edee;
+  --bg: #f6f8f8;
+  --white: #ffffff;
+  
+  --shadow-sm: 0 1px 2px rgba(20, 36, 43, 0.04);
+  --shadow-card: 0 2px 12px rgba(20, 36, 43, 0.06);
+  --shadow-pop: 0 8px 28px rgba(20, 36, 43, 0.14);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-plus-jakarta-sans);
 
-  /* Warm Rose Brand Palette (Accent Color) */
-  --color-brand-50: #fff1f2;
-  --color-brand-100: #ffe4e6;
-  --color-brand-200: #fecdd3;
-  --color-brand-300: #fda4af;
-  --color-brand-400: #fb7185;
-  --color-brand-500: #f43f5e;
-  --color-brand-600: #e11d48;
-  --color-brand-700: #be123c;
-  --color-brand-800: #9f1239;
-  --color-brand-900: #881337;
-  --color-brand-950: #4c0519;
+  /* Map brand colors to Blue palette for seamless UI adaptation */
+  --color-brand-50: var(--blue-tint);
+  --color-brand-100: #dce7f7;
+  --color-brand-200: #b9cfee;
+  --color-brand-300: #8bb1e2;
+  --color-brand-400: #558cd2;
+  --color-brand-500: var(--blue);
+  --color-brand-600: var(--blue);
+  --color-brand-700: var(--blue-dark);
+  --color-brand-800: #041026;
+  --color-brand-900: #020817;
+  --color-brand-950: #01040a;
+
+  /* Mockup Palette Mappings */
+  --color-blue: var(--blue);
+  --color-blue-dark: var(--blue-dark);
+  --color-blue-tint: var(--blue-tint);
+  --color-blue-tint-2: var(--blue-tint-2);
+
+  /* Safe Fallback Mappings for Teal styles */
+  --color-teal: var(--blue);
+  --color-teal-dark: var(--blue-dark);
+  --color-teal-tint: var(--blue-tint);
+  --color-teal-tint-2: var(--blue-tint-2);
+  
+  --color-coral: var(--coral);
+  --color-coral-tint: var(--coral-tint);
+  
+  --color-amber: var(--amber);
+  
+  --color-green: var(--green);
+  --color-green-tint: var(--green-tint);
+  
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  
+  --color-line: var(--line);
+}
+
+html, body {
+  max-width: 100vw;
+  width: 100%;
+  overflow-x: hidden;
+  height: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), -apple-system, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  line-height: 1.45;
   
   /* Native App Constraints */
-  user-select: none; /* Prevent accidental text highlighting */
+  user-select: none;
   -webkit-user-select: none;
-  -webkit-tap-highlight-color: transparent; /* Remove blue tap flash */
-  overscroll-behavior-y: none; /* Disable iOS elastic bounce */
-  touch-action: pan-x pan-y; /* Prevent pinch zoom */
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+  touch-action: pan-x pan-y;
+}
+
+/* Make fonts fully consistent on form controls & buttons, force 16px minimum to prevent auto-zoom */
+input, select, textarea, button {
+  font-family: inherit;
+}
+
+input, select, textarea {
+  font-size: 16px !important;
 }
 
 /* Hide scrollbars globally but allow scrolling */
@@ -45,6 +111,6 @@ body {
   display: none;
 }
 * {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

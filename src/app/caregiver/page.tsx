@@ -5,7 +5,10 @@ import { getViewer } from "@/lib/session";
 import { profileCompleteness } from "@/lib/completeness";
 import { CompletenessBar } from "@/components/CompletenessBar";
 import { toggleHidden } from "@/app/actions/caregiver";
+import { logout } from "@/app/actions/auth";
 import { CaregiverProfilePreview } from "@/components/CaregiverProfilePreview";
+import { cookies } from "next/headers";
+import { getTranslations } from "@/lib/translations";
 
 export default async function CaregiverDashboard() {
   const { session } = await getViewer();
@@ -19,9 +22,11 @@ export default async function CaregiverDashboard() {
 
   const percent = profileCompleteness(cg);
   const isVerified = cg.verifications.length > 0;
+  const lang = (await cookies()).get("lang")?.value || "en";
+  const t = getTranslations(lang);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col gap-6 p-6">
+    <main className="mx-auto flex max-w-md w-full flex-col gap-6 p-6 pb-24">
       {/* Account Dashboard Summary */}
       <section className="flex flex-col gap-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         <div className="flex items-center justify-between">
@@ -49,6 +54,18 @@ export default async function CaregiverDashboard() {
         </form>
       </section>
 
+      {/* Logout Action */}
+      <div className="mt-2">
+        <form action={logout}>
+          <button className="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50/50 px-4 py-4 text-base font-bold text-red-600 shadow-sm transition-transform active:scale-[0.98] hover:bg-red-50 hover:text-red-700">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            {t.logout || "Log Out"}
+          </button>
+        </form>
+      </div>
+
       {/* Separator / Preview Header */}
       <div className="flex items-center gap-3 py-2">
         <div className="h-[1px] flex-1 bg-gray-200" />
@@ -63,6 +80,7 @@ export default async function CaregiverDashboard() {
         isOwnProfile={true}
         isLoggedIn={true}
         isVerified={isVerified}
+        lang={lang}
       />
     </main>
   );

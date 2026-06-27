@@ -2,11 +2,17 @@ import Link from "next/link";
 import { type PublicCaregiver } from "@/lib/serializers";
 import type { Caregiver } from "@prisma/client";
 import { TiltCard } from "@/components/TiltCard";
+import { translateCity, translateSpecialty } from "@/lib/translations";
 
-export function ProfileCard({ caregiver }: { caregiver: PublicCaregiver | Caregiver }) {
+export function ProfileCard({ caregiver, lang = "en" }: { caregiver: PublicCaregiver | Caregiver; lang?: string }) {
   const isPublic = !("name" in caregiver);
   const hasImage = !isPublic && !!(caregiver as Caregiver).photoUrl;
   
+  const rawSkills = caregiver.skills ? JSON.parse(caregiver.skills) : [];
+  const skillsToDisplay = rawSkills.length > 0 
+    ? rawSkills.slice(0, 2).map((s: string) => translateSpecialty(s, lang)).join(", ") + (rawSkills.length > 2 ? "..." : "")
+    : "—";
+
   return (
     <TiltCard maxRotation={5} scale={1.01} className="w-full">
       <div className="group relative h-full overflow-hidden rounded-[2rem] border border-white bg-white/90 p-5 shadow-xl shadow-slate-200/50 backdrop-blur-xl transition-all duration-500 ease-out hover:shadow-2xl hover:shadow-slate-300/60 active:scale-[0.98]">
@@ -30,15 +36,19 @@ export function ProfileCard({ caregiver }: { caregiver: PublicCaregiver | Caregi
             {isPublic ? (
               <div className="mb-2 inline-flex items-center gap-1.5 rounded-md bg-brand-50 px-2 py-1 text-[10px] font-bold tracking-widest text-brand-700 ring-1 ring-brand-500/20">
                 <svg className="h-3 w-3 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                HIDDEN PROFILE
+                {lang === "ta" ? "சுயவிவரம் பாதுகாக்கப்பட்டது" : "HIDDEN PROFILE"}
               </div>
             ) : (
               <h3 className="text-xl font-extrabold tracking-tight text-blue-950">{(caregiver as Caregiver).name}</h3>
             )}
             <div className="mt-1 flex items-center gap-2 text-sm font-medium text-slate-500">
-              {caregiver.city && <span>{caregiver.city}</span>}
+              {caregiver.city && <span>{translateCity(caregiver.city, lang)}</span>}
               {caregiver.city && caregiver.experienceYears != null && <span>•</span>}
-              {caregiver.experienceYears != null && <span>{caregiver.experienceYears} yrs exp</span>}
+              {caregiver.experienceYears != null && (
+                <span>
+                  {lang === "ta" ? `${caregiver.experienceYears} வருட அனுபவம்` : `${caregiver.experienceYears} yrs exp`}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -46,15 +56,23 @@ export function ProfileCard({ caregiver }: { caregiver: PublicCaregiver | Caregi
         {/* Stats Strip */}
         <div className="mt-5 grid grid-cols-2 gap-4 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100">
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Skills</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              {lang === "ta" ? "திறன்கள்" : "Skills"}
+            </span>
             <span className="mt-1 text-sm font-semibold text-slate-700 truncate">
-              {caregiver.skills ? JSON.parse(caregiver.skills).slice(0, 2).join(", ") + (JSON.parse(caregiver.skills).length > 2 ? "..." : "") : "—"}
+              {skillsToDisplay}
             </span>
           </div>
           <div className="flex flex-col border-l border-slate-200 pl-4">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Rate</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              {lang === "ta" ? "கட்டணம்" : "Rate"}
+            </span>
             <span className="mt-1 text-sm font-bold text-blue-950 truncate">
-              {caregiver.dailyRate ? `₹${caregiver.dailyRate}/day` : caregiver.monthlyRate ? `₹${caregiver.monthlyRate}/mo` : "—"}
+              {caregiver.dailyRate 
+                ? `₹${caregiver.dailyRate}/${lang === "ta" ? "நாள்" : "day"}` 
+                : caregiver.monthlyRate 
+                  ? `₹${caregiver.monthlyRate}/${lang === "ta" ? "மாதம்" : "mo"}` 
+                  : "—"}
             </span>
           </div>
         </div>
@@ -62,7 +80,7 @@ export function ProfileCard({ caregiver }: { caregiver: PublicCaregiver | Caregi
         {/* Action Button */}
         <div className="mt-5">
           <Link href={`/c/${caregiver.id}`} className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-950 py-4 text-sm font-bold text-white shadow-lg shadow-blue-900/20 transition-all duration-300 hover:bg-blue-900 active:scale-[0.98]">
-            View Full Profile
+            {lang === "ta" ? "முழு சுயவிவரம் காண்க" : "View Full Profile"}
             <svg className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
           </Link>
         </div>

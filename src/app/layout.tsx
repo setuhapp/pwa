@@ -1,17 +1,14 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { NavigationShim } from "@/components/NavigationShim";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { getViewer } from "@/lib/session";
+import { cookies } from "next/headers";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta-sans",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 import type { Metadata, Viewport } from "next";
@@ -22,6 +19,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: "cover",
 };
 
 export const metadata: Metadata = {
@@ -44,14 +42,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const { session, tier } = await getViewer();
+  const lang = (await cookies()).get("lang")?.value || "en";
   
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang={lang}
+      className={`${plusJakartaSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-gray-50">
-        <NavigationShim tier={tier} userType={session?.userType ?? null}>{children}</NavigationShim>
+        <NavigationShim tier={tier} userType={session?.userType ?? null} lang={lang}>{children}</NavigationShim>
         <InstallPrompt />
       </body>
     </html>

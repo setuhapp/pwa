@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getViewer } from "@/lib/session";
 import { toPublicCaregiver, toFullCaregiver } from "@/lib/serializers";
 import { CaregiverProfilePreview } from "@/components/CaregiverProfilePreview";
+import { cookies } from "next/headers";
 
 export default async function PublicProfile({
   params,
@@ -33,6 +34,18 @@ export default async function PublicProfile({
 
   const cg = canSeeDetails ? toFullCaregiver(rawCg) : toPublicCaregiver(rawCg);
   const isVerified = rawCg.verifications.length > 0;
+  const lang = (await cookies()).get("lang")?.value || "en";
+
+  let isBookmarked = false;
+  if (session?.userType === "member") {
+    const bookmarkCount = await db.bookmark.count({
+      where: {
+        memberId: session.userId,
+        caregiverId: id,
+      },
+    });
+    isBookmarked = bookmarkCount > 0;
+  }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col gap-6 p-6">
@@ -42,6 +55,8 @@ export default async function PublicProfile({
         isOwnProfile={session?.userType === "caregiver" && session.userId === rawCg.id}
         isLoggedIn={!!session}
         isVerified={isVerified}
+        isBookmarked={isBookmarked}
+        lang={lang}
       />
     </main>
   );

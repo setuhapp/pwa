@@ -25,9 +25,9 @@ export default async function OnboardingStep({
   const labelClass = "flex flex-col gap-1 text-sm font-medium text-gray-700";
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col gap-6 p-6">
+    <main className="mx-auto flex max-w-md w-full flex-col gap-6 p-6 pb-12">
       <div className="flex items-center justify-between">
-        <Link href="/caregiver" className="text-sm text-blue-600 underline">
+        <Link href="/caregiver" className="text-sm text-blue underline">
           ← Back
         </Link>
         <span className="text-sm text-gray-500">Step {stepNum} of 4</span>
@@ -39,7 +39,7 @@ export default async function OnboardingStep({
           <form action={saveStep1} className="flex flex-col gap-4">
             <label className={labelClass}>
               Photo
-              <input type="file" name="photo" accept="image/*" className="rounded-xl border px-4 py-3 text-base" />
+              <input type="file" name="photo" accept="image/*" className="w-full rounded-xl border px-4 py-3 text-base" />
             </label>
             <label className={labelClass}>
               Full name
@@ -71,7 +71,7 @@ export default async function OnboardingStep({
                 ))}
               </select>
             </label>
-            <button className="mt-2 rounded-xl bg-blue-600 px-4 py-4 text-lg font-semibold text-white">
+            <button className="mt-2 rounded-xl bg-blue px-4 py-4 text-lg font-semibold text-white">
               Save &amp; go live
             </button>
           </form>
@@ -109,7 +109,7 @@ export default async function OnboardingStep({
                 className={inputClass}
               />
             </label>
-            <button className="mt-2 rounded-xl bg-blue-600 px-4 py-4 text-lg font-semibold text-white">
+            <button className="mt-2 rounded-xl bg-blue px-4 py-4 text-lg font-semibold text-white">
               Save
             </button>
           </form>
@@ -173,7 +173,7 @@ export default async function OnboardingStep({
                 </label>
               ))}
             </div>
-            <button className="mt-2 rounded-xl bg-blue-600 px-4 py-4 text-lg font-semibold text-white">
+            <button className="mt-2 rounded-xl bg-blue px-4 py-4 text-lg font-semibold text-white">
               Save
             </button>
           </form>
@@ -206,7 +206,7 @@ export default async function OnboardingStep({
                 className={inputClass}
               />
             </label>
-            <button className="mt-2 rounded-xl bg-blue-600 px-4 py-4 text-lg font-semibold text-white">
+            <button className="mt-2 rounded-xl bg-blue px-4 py-4 text-lg font-semibold text-white">
               Save
             </button>
           </form>

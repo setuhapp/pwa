@@ -5,19 +5,24 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Tier } from "@/lib/viewer";
 import { logout } from "@/app/actions/auth";
+import { getTranslations } from "@/lib/translations";
 
 export function NavigationShim({ 
   children, 
   tier, 
-  userType 
+  userType,
+  lang = "en"
 }: { 
   children: React.ReactNode; 
   tier: Tier; 
   userType: "caregiver" | "member" | "admin" | null;
+  lang?: string;
 }) {
   const pathname = usePathname();
   const router = useRouter();
   const [canGoBack, setCanGoBack] = useState(false);
+
+  const t = getTranslations(lang);
 
   useEffect(() => {
     setCanGoBack(window.history.length > 2); // basic check for back history
@@ -44,30 +49,60 @@ export function NavigationShim({
 
   return (
     <>
-      {/* Top App Bar - Glassmorphism */}
+      {/* Top App Bar - Solid Blue with White Text per Mockup */}
       {!hideTopNav && (
-        <header className="fixed left-0 right-0 top-0 z-50 flex h-16 items-center justify-center border-b border-gray-200/50 bg-white/70 px-4 shadow-[0_4px_30px_rgb(0,0,0,0.03)] backdrop-blur-xl">
-          {showBackButton && (
+        <header className="fixed left-0 right-0 top-0 z-50 flex h-16 items-center justify-between bg-blue text-white px-4 shadow-sm select-none">
+          {/* Left: Back Button or spacer */}
+          <div className="flex w-10 items-center justify-start flex-shrink-0">
+            {showBackButton && (
+              <button
+                onClick={() => {
+                  if (canGoBack) router.back();
+                  else router.push(userType === "caregiver" ? "/caregiver" : "/browse");
+                }}
+                className="flex h-[38px] w-[38px] items-center justify-center rounded-xl bg-white/12 text-white border-none cursor-pointer transition-all active:scale-90 hover:bg-white/20"
+                aria-label="Back"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* Center: Title Link */}
+          <div className="flex-1 flex justify-center min-w-0">
+            <Link href="/" className="text-base font-extrabold tracking-tight text-white hover:opacity-90 active:scale-95 transition-all truncate">
+              SETUH
+            </Link>
+          </div>
+          
+          {/* Right: Actions */}
+          <div className="flex items-center gap-1.5 justify-end flex-shrink-0">
             <button
               onClick={() => {
-                if (canGoBack) router.back();
-                else router.push(userType === "caregiver" ? "/caregiver" : "/browse");
+                const nextLang = lang === "en" ? "ta" : "en";
+                document.cookie = `lang=${nextLang}; path=/; max-age=${60 * 60 * 24 * 365}`;
+                window.location.reload();
               }}
-              className="absolute left-4 flex h-10 w-10 items-center justify-center rounded-full bg-gray-50/80 text-gray-700 transition-transform active:scale-90"
-              aria-label="Go back"
+              className="px-2.5 py-1.5 rounded-full bg-white/14 text-[11px] font-semibold text-white border-none cursor-pointer flex items-center gap-1 transition-all active:scale-95 hover:bg-white/20 select-none"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
+              <span className={lang === "en" ? "text-white font-extrabold" : "text-white/50"}>EN</span>
+              <span className="text-white/30 text-[10px] select-none">|</span>
+              <span className={lang === "ta" ? "text-white font-extrabold" : "text-white/50"}>தமிழ்</span>
             </button>
-          )}
-          <h1 className="text-lg font-bold tracking-tight text-gray-900">SETUH</h1>
-          
-          {userType === "caregiver" && (
-            <form action={logout} className="absolute right-4">
-              <button className="rounded-xl border border-red-200 bg-red-50/50 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-red-600 hover:bg-red-100 hover:text-red-700 transition-all active:scale-[0.98]">
-                Logout
-              </button>
-            </form>
-          )}
+            
+            {/* No logout in header */}
+          </div>
         </header>
       )}
 
@@ -76,15 +111,15 @@ export function NavigationShim({
         {children}
       </div>
 
-      {/* Bottom Navigation - Glassmorphism */}
+      {/* Bottom Navigation - Solid White with Line Border per Mockup */}
       {!hideBottomNav && (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-20 border-t border-gray-200/50 bg-white/80 pb-safe shadow-[0_-4px_30px_rgb(0,0,0,0.03)] backdrop-blur-xl">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-20 border-t border-line bg-white pb-safe shadow-sm">
           {/* Home / Browse Tab */}
           {userType !== "caregiver" && (
             <Link
               href={userType === null ? "/" : "/browse"}
               className={`flex flex-1 flex-col items-center justify-center gap-1.5 transition-all duration-200 active:scale-95 ${
-                pathname === "/browse" || pathname === "/" ? "text-brand-600" : "text-gray-400 hover:text-gray-600"
+                pathname === "/browse" || pathname === "/" ? "text-blue" : "text-ink-3 hover:text-blue"
               }`}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +129,24 @@ export function NavigationShim({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname === "/browse" ? 2.5 : 2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 )}
               </svg>
-              <span className="text-[11px] font-semibold tracking-wide">{userType === null ? "Home" : "Browse"}</span>
+              <span className="text-[11.5px] font-semibold tracking-wide">
+                {userType === null ? t.nav_home : t.nav_browse}
+              </span>
+            </Link>
+          )}
+
+          {/* Saved Tab */}
+          {userType === "member" && (
+            <Link
+              href="/member/bookmarks"
+              className={`flex flex-1 flex-col items-center justify-center gap-1.5 transition-all duration-200 active:scale-95 ${
+                pathname === "/member/bookmarks" ? "text-blue" : "text-ink-3 hover:text-blue"
+              }`}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname === "/member/bookmarks" ? 2.5 : 2} d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+              <span className="text-[11.5px] font-semibold tracking-wide">{t.nav_saved}</span>
             </Link>
           )}
 
@@ -103,14 +155,14 @@ export function NavigationShim({
             href={userType === null ? "/login?role=member" : "/messages"}
             className={`flex flex-1 flex-col items-center justify-center gap-1.5 transition-all duration-200 active:scale-95 ${
               pathname.startsWith("/messages")
-                ? "text-brand-600"
-                : "text-gray-400 hover:text-gray-600"
+                ? "text-blue"
+                : "text-ink-3 hover:text-blue"
             }`}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname.startsWith("/messages") ? 2.5 : 2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
-            <span className="text-[11px] font-semibold tracking-wide">Messages</span>
+            <span className="text-[11.5px] font-semibold tracking-wide">{t.nav_messages}</span>
           </Link>
 
           {/* Settings / Account Tab */}
@@ -118,8 +170,8 @@ export function NavigationShim({
             href={userType === null ? "/login" : (userType === "caregiver" ? "/caregiver" : "/member/settings")}
             className={`flex flex-1 flex-col items-center justify-center gap-1.5 transition-all duration-200 active:scale-95 ${
               pathname.startsWith("/member/settings") || pathname.startsWith("/caregiver") || pathname === "/login"
-                ? "text-brand-600"
-                : "text-gray-400 hover:text-gray-600"
+                ? "text-blue"
+                : "text-ink-3 hover:text-blue"
             }`}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,8 +184,8 @@ export function NavigationShim({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname.startsWith("/caregiver") || pathname === "/login" ? 2.5 : 2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               )}
             </svg>
-            <span className="text-[11px] font-semibold tracking-wide">
-              {userType === null ? "Log in" : (userType === "caregiver" ? "Account" : "Settings")}
+            <span className="text-[11.5px] font-semibold tracking-wide">
+              {userType === null ? t.nav_login : (userType === "caregiver" ? t.nav_account : t.nav_settings)}
             </span>
           </Link>
         </nav>
