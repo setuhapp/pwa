@@ -10,9 +10,16 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
         <input type="hidden" name="role" value={role} />
         <input name="phone" inputMode="tel" placeholder="Phone number" required className="rounded-xl border px-4 py-4 text-lg" />
         <input name="code" placeholder="OTP (use 000000)" required className="rounded-xl border px-4 py-4 text-lg" />
-        <button className="rounded-xl bg-blue-600 px-4 py-4 text-lg font-semibold text-white">Continue</button>
+        <button className="rounded-xl bg-blue px-4 py-4 text-lg font-semibold text-white">Continue</button>
       </form>
-      <p className="text-sm text-gray-500">Dev mode: any phone, OTP is 000000.</p>
+      <div className="text-sm text-gray-500 flex flex-col gap-1 mt-1">
+        <p>Dev mode: any phone number, OTP is 000000.</p>
+        {role === "member" && (
+          <p className="text-blue font-bold">
+            💡 Subscribed member test account (unlocked profiles): 9200000000
+          </p>
+        )}
+      </div>
     </main>
   );
 }

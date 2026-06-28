@@ -36,6 +36,7 @@ export function CaregiverProfilePreview({
   const cg = caregiver;
   const skills = parseStringArray(cg.skills);
   const specs = parseStringArray(cg.specialisations);
+  const langs = parseStringArray("languages" in cg ? cg.languages : null);
   const t = getTranslations(lang);
 
   // Expose fields conditionally based on access tier
@@ -171,6 +172,27 @@ export function CaregiverProfilePreview({
           <p className="text-sm text-ink-3 text-center py-2">{t.no_skills}</p>
         )}
       </div>
+
+      {/* 2.1 LANGUAGES KNOWN CARD */}
+      {langs.length > 0 && (
+        <div className="section bg-white mx-0 mt-3.5 rounded-[18px] p-[18px] shadow-sm border border-line/30">
+          <div className="section-head flex items-center gap-[9px] mb-[15px] select-none">
+            <div className="section-ic w-[30px] h-[30px] rounded-[9px] bg-indigo-50 flex items-center justify-center text-[15px] flex-shrink-0">
+              🗣️
+            </div>
+            <div className="section-title text-[15px] font-bold tracking-tight text-ink">
+              {lang === "ta" ? "அறிந்த மொழிகள்" : "Languages known"}
+            </div>
+          </div>
+          <div className="chips flex flex-wrap gap-2">
+            {langs.map((l) => (
+              <span key={l} className="chip py-2 px-3.5 rounded-[11px] text-[13.5px] font-bold bg-indigo-50 text-indigo-700 leading-none">
+                {l === "English" ? (lang === "ta" ? "ஆங்கிலம்" : "English") : l === "Tamil" ? (lang === "ta" ? "தமிழ்" : "Tamil") : l === "Hindi" ? (lang === "ta" ? "இந்தி" : "Hindi") : l === "Malayalam" ? (lang === "ta" ? "மலையாளம்" : "Malayalam") : l === "Kannada" ? (lang === "ta" ? "கன்னடம்" : "Kannada") : l}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 3. VERIFICATION TIMELINE CARD */}
       <div className="section bg-white mx-0 mt-3.5 rounded-[18px] p-[18px] shadow-sm border border-line/30">

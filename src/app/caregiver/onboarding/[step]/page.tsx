@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getViewer } from "@/lib/session";
-import { CITIES, SKILL_TAGS, SPECIALISATIONS, AVAILABILITY } from "@/lib/constants";
+import { CITIES, SKILL_TAGS, SPECIALISATIONS, AVAILABILITY, LANGUAGES } from "@/lib/constants";
 import { saveStep1, saveStep2, saveStep3, saveStep4 } from "@/app/actions/caregiver";
 import { parseStringArray } from "@/lib/json";
 import { cookies } from "next/headers";
@@ -119,6 +119,30 @@ export default async function OnboardingStep({
                 );
               })}
             </div>
+            
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-gray-700">
+                {lang === "ta" ? "அறிந்த மொழிகள்" : "Languages known"}
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {LANGUAGES.map((l) => {
+                  const checked = parseStringArray(cg.languages).includes(l);
+                  return (
+                    <label key={l} className="flex items-center gap-3 rounded-xl border px-4 py-3 text-base">
+                      <input
+                        type="checkbox"
+                        name="languages"
+                        value={l}
+                        defaultChecked={checked}
+                        className="h-5 w-5"
+                      />
+                      {l}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
             <label className={labelClass}>
               Qualifications
               <input

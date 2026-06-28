@@ -81,8 +81,9 @@ export function NavigationShim({
 
           {/* Center: Title Link (Centered Absolutely to Viewport) */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-            <Link href="/" className="text-base font-extrabold tracking-tight text-white hover:opacity-90 active:scale-95 transition-all select-none">
-              SETUH
+            <Link href="/" className="flex items-center gap-1.5 text-base font-extrabold tracking-tight text-white hover:opacity-90 active:scale-95 transition-all select-none">
+              <img src="/logo.png" alt="" className="h-[22px] w-[22px] object-contain rounded-md bg-white p-0.5" />
+              <span>SETUH</span>
             </Link>
           </div>
           

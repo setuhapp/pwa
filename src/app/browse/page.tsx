@@ -36,7 +36,8 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
   });
 
   const orderedIds = rawCaregivers.map((c) => c.id);
-  const { visibleIds, capped } = applyCap(orderedIds, tier, viewedIds);
+  const validViewedIds = viewedIds.filter((id) => orderedIds.includes(id));
+  const { visibleIds, capped } = applyCap(orderedIds, tier, validViewedIds);
 
   const visibleCaregivers = rawCaregivers.filter((c) => visibleIds.includes(c.id));
   const serialized = visibleCaregivers.map((c) => (tier === "anon" ? toPublicCaregiver(c) : toFullCaregiver(c)));

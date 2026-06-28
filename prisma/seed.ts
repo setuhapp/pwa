@@ -3,6 +3,7 @@ import { db } from "../src/lib/db";
 async function main() {
   // Wipe in FK-safe order (child tables before parent tables).
   // review does NOT exist yet in the schema — skip it.
+  await db.message.deleteMany();
   await db.bookmark.deleteMany();
   await db.engagement.deleteMany();
   await db.verification.deleteMany();
@@ -25,6 +26,7 @@ async function main() {
         experienceYears: 8,
         priorFamilies: "5 families over 8 years",
         specialisations: JSON.stringify(["dementia", "post-stroke"]),
+        languages: JSON.stringify(["English", "Tamil"]),
         availability: "live-in",
         dailyRate: 1000,
         monthlyRate: 22000,
@@ -43,6 +45,7 @@ async function main() {
         experienceYears: 5,
         priorFamilies: "3 families",
         specialisations: JSON.stringify(["bedridden", "post-op"]),
+        languages: JSON.stringify(["English", "Tamil", "Malayalam"]),
         availability: "part-time",
         dailyRate: 700,
         monthlyRate: 15000,
@@ -61,6 +64,7 @@ async function main() {
         experienceYears: 12,
         priorFamilies: "7 families",
         specialisations: JSON.stringify(["dementia", "palliative"]),
+        languages: JSON.stringify(["English", "Tamil", "Hindi"]),
         availability: "live-in",
         dailyRate: 1200,
         monthlyRate: 26000,
@@ -79,6 +83,7 @@ async function main() {
         experienceYears: 6,
         priorFamilies: "4 families",
         specialisations: JSON.stringify(["post-stroke", "general"]),
+        languages: JSON.stringify(["English", "Kannada", "Malayalam"]),
         availability: "part-time",
         dailyRate: 900,
         monthlyRate: 19000,
@@ -97,6 +102,7 @@ async function main() {
         experienceYears: 3,
         priorFamilies: "2 families",
         specialisations: JSON.stringify(["general", "post-op"]),
+        languages: JSON.stringify(["English", "Hindi", "Telugu"]),
         availability: "live-in",
         dailyRate: 750,
         monthlyRate: 16000,
@@ -116,6 +122,7 @@ async function main() {
         experienceYears: 9,
         priorFamilies: "6 families",
         specialisations: JSON.stringify(["dementia"]),
+        languages: JSON.stringify(["English", "Tamil"]),
         availability: "live-in",
         dailyRate: 950,
         monthlyRate: 21000,
@@ -134,6 +141,7 @@ async function main() {
         experienceYears: 4,
         priorFamilies: "3 families",
         specialisations: JSON.stringify(["post-stroke", "bedridden"]),
+        languages: JSON.stringify(["English", "Tamil"]),
         availability: "part-time",
         dailyRate: 650,
         monthlyRate: 14000,
@@ -169,8 +177,19 @@ async function main() {
     },
   });
 
+  // Insert one subscribed member for testing
+  const testMember = await db.member.create({
+    data: {
+      phone: "9200000000",
+      name: "Subscribed Member",
+      subscriptionStatus: "active",
+      subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+    },
+  });
+
   console.log(`Inserted ${caregivers.length} caregivers (2 hidden, 1 partial at 25%).`);
   console.log(`Inserted 1 admin: ${admin.name} (${admin.phone}).`);
+  console.log(`Inserted 1 subscribed member: ${testMember.name} (${testMember.phone}).`);
 }
 
 main()

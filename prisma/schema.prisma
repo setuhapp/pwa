@@ -20,6 +20,7 @@ model Caregiver {
   experienceYears Int?
   priorFamilies   String?
   specialisations String?  // JSON array
+  languages       String?  // JSON array
   availability    String?  // live-in | part-time
   dailyRate       Int?
   monthlyRate     Int?

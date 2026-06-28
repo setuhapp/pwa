@@ -9,3 +9,4 @@ export const CITIES = ["Chennai", "Coimbatore", "Madurai", "Bengaluru", "Hyderab
 export const SPECIALISATIONS = ["dementia", "post-stroke", "bedridden", "post-op", "palliative", "general"];
 export const SKILL_TAGS = ["dementia", "post-stroke", "bedridden", "injection", "physiotherapy-aware", "cooking", "mobility-assist"];
 export const AVAILABILITY = ["live-in", "part-time"] as const;
+export const LANGUAGES = ["English", "Hindi", "Tamil", "Malayalam", "Kannada"] as const;

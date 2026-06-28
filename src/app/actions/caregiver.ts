@@ -40,9 +40,14 @@ export async function saveStep1(formData: FormData) {
 export async function saveStep2(formData: FormData) {
   const id = await requireCaregiver();
   const skills = formData.getAll("skills").map(String);
+  const languages = formData.getAll("languages").map(String);
   await db.caregiver.update({
     where: { id },
-    data: { skills: JSON.stringify(skills), qualifications: String(formData.get("qualifications") ?? "") },
+    data: {
+      skills: JSON.stringify(skills),
+      languages: JSON.stringify(languages),
+      qualifications: String(formData.get("qualifications") ?? "")
+    },
   });
   revalidatePath("/caregiver");
   revalidatePath("/caregiver/onboarding/[step]", "page");
