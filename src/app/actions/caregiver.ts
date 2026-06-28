@@ -32,7 +32,9 @@ export async function saveStep1(formData: FormData) {
       ...(photoUrl ? { photoUrl } : {}),
     },
   });
-  redirect("/caregiver"); // live after step 1
+  revalidatePath("/caregiver");
+  revalidatePath("/caregiver/onboarding/[step]", "page");
+  redirect("/caregiver/onboarding/2"); // go to step 2 after saving step 1
 }
 
 export async function saveStep2(formData: FormData) {
@@ -42,7 +44,9 @@ export async function saveStep2(formData: FormData) {
     where: { id },
     data: { skills: JSON.stringify(skills), qualifications: String(formData.get("qualifications") ?? "") },
   });
-  redirect("/caregiver");
+  revalidatePath("/caregiver");
+  revalidatePath("/caregiver/onboarding/[step]", "page");
+  redirect("/caregiver/onboarding/3"); // go to step 3 after saving step 2
 }
 
 export async function saveStep3(formData: FormData) {
@@ -56,7 +60,9 @@ export async function saveStep3(formData: FormData) {
       availability: String(formData.get("availability") ?? ""),
     },
   });
-  redirect("/caregiver");
+  revalidatePath("/caregiver");
+  revalidatePath("/caregiver/onboarding/[step]", "page");
+  redirect("/caregiver/onboarding/4"); // go to step 4 after saving step 3
 }
 
 export async function saveStep4(formData: FormData) {
@@ -65,6 +71,8 @@ export async function saveStep4(formData: FormData) {
     where: { id },
     data: { dailyRate: optionalNumber(formData.get("dailyRate")), monthlyRate: optionalNumber(formData.get("monthlyRate")) },
   });
+  revalidatePath("/caregiver");
+  revalidatePath("/caregiver/onboarding/[step]", "page");
   redirect("/caregiver");
 }
 

@@ -22,8 +22,8 @@ export default async function Home() {
 
       <div className="relative z-10 mb-8 flex flex-col items-center text-center">
         <TiltCard maxRotation={20} scale={1.05} className="mb-6">
-          <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white/10 p-4 shadow-[0_0_40px_rgba(255,255,255,0.1)] backdrop-blur-md ring-1 ring-white/20">
-            <svg className="h-10 w-10 text-brand-400 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white p-2 shadow-xl overflow-hidden border border-white/20 select-none">
+            <img src="/logo.png" alt="Setuh Logo" className="h-full w-full object-contain" />
           </div>
         </TiltCard>
         <h1 className="text-5xl font-extrabold tracking-tight text-white drop-shadow-lg mb-2">

@@ -5,6 +5,7 @@ import { getViewer } from "@/lib/session";
 import { CITIES, SKILL_TAGS, SPECIALISATIONS, AVAILABILITY } from "@/lib/constants";
 import { saveStep1, saveStep2, saveStep3, saveStep4 } from "@/app/actions/caregiver";
 import { parseStringArray } from "@/lib/json";
+import { cookies } from "next/headers";
 
 export default async function OnboardingStep({
   params,
@@ -23,6 +24,7 @@ export default async function OnboardingStep({
   const stepNum = Number(step);
   const inputClass = "w-full rounded-xl border px-4 py-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-500";
   const labelClass = "flex flex-col gap-1 text-sm font-medium text-gray-700";
+  const lang = (await cookies()).get("lang")?.value || "en";
 
   return (
     <main className="mx-auto flex max-w-md w-full flex-col gap-6 p-6 pb-12">
@@ -33,10 +35,27 @@ export default async function OnboardingStep({
         <span className="text-sm text-gray-500">Step {stepNum} of 4</span>
       </div>
 
+      {/* Onboarding Wizard Tabs */}
+      <div className="flex border-b border-line pb-2 mb-2 justify-between gap-1 select-none">
+        {["1", "2", "3", "4"].map((s) => (
+          <Link
+            key={s}
+            href={`/caregiver/onboarding/${s}`}
+            className={`pb-1 px-2.5 text-sm font-bold border-b-2 transition-all duration-200 ${
+              step === s 
+                ? "border-blue text-blue font-extrabold" 
+                : "border-transparent text-ink-3 hover:text-ink-2"
+            }`}
+          >
+            {lang === "ta" ? `படி ${s}` : `Step ${s}`}
+          </Link>
+        ))}
+      </div>
+
       {step === "1" && (
         <>
           <h1 className="text-2xl font-bold">Your details</h1>
-          <form action={saveStep1} className="flex flex-col gap-4">
+          <form action={saveStep1} encType="multipart/form-data" className="flex flex-col gap-4">
             <label className={labelClass}>
               Photo
               <input type="file" name="photo" accept="image/*" className="w-full rounded-xl border px-4 py-3 text-base" />
@@ -72,7 +91,7 @@ export default async function OnboardingStep({
               </select>
             </label>
             <button className="mt-2 rounded-xl bg-blue px-4 py-4 text-lg font-semibold text-white">
-              Save &amp; go live
+              Save
             </button>
           </form>
         </>
