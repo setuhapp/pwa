@@ -28,13 +28,13 @@ export default async function BookmarksPage() {
   });
 
   return (
-    <main className="relative mx-auto flex min-h-screen max-w-md flex-col bg-slate-50 pb-24">
+    <main className="relative mx-auto flex max-w-md w-full flex-col bg-slate-50 pb-24">
       {/* Dark Blue Hero Background */}
       <div className="absolute inset-x-0 top-0 h-[220px] bg-gradient-to-b from-blue via-blue/90 to-slate-50 rounded-b-[3rem] shadow-sm" />
 
       <div className="relative z-10 flex flex-col gap-6 p-6 pt-12">
         <div className="mb-2 text-center text-white drop-shadow-md">
-          <h1 className="text-3xl font-extrabold tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             {lang === "ta" ? "சேமிக்கப்பட்டவை" : "Saved Caregivers"}
           </h1>
           <p className="mt-2 text-sm font-medium text-slate-300">

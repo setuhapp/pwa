@@ -42,13 +42,13 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
   const serialized = visibleCaregivers.map((c) => (tier === "anon" ? toPublicCaregiver(c) : toFullCaregiver(c)));
 
   return (
-    <main className="relative mx-auto flex min-h-screen max-w-md flex-col bg-slate-50 pb-24">
+    <main className="relative mx-auto flex max-w-md w-full flex-col bg-slate-50 pb-24">
       {/* Dark Hero Background */}
       <div className="absolute inset-x-0 top-0 h-[340px] bg-gradient-to-b from-blue-950 via-blue-900 to-slate-50 rounded-b-[3rem] shadow-sm" />
 
       <div className="relative z-10 flex flex-col gap-6 p-6 pt-12">
         <div className="mb-2 text-center text-white drop-shadow-md">
-          <h1 className="text-4xl font-extrabold tracking-tight">{t.browse_header}</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{t.browse_header}</h1>
           <p className="mt-2 text-sm font-medium text-slate-300">{t.browse_sub}</p>
         </div>
         

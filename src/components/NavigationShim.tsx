@@ -79,9 +79,9 @@ export function NavigationShim({
             )}
           </div>
 
-          {/* Center: Title Link */}
-          <div className="flex-1 flex justify-center min-w-0">
-            <Link href="/" className="text-base font-extrabold tracking-tight text-white hover:opacity-90 active:scale-95 transition-all truncate">
+          {/* Center: Title Link (Centered Absolutely to Viewport) */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+            <Link href="/" className="text-base font-extrabold tracking-tight text-white hover:opacity-90 active:scale-95 transition-all select-none">
               SETUH
             </Link>
           </div>
@@ -113,7 +113,7 @@ export function NavigationShim({
 
       {/* Bottom Navigation - Solid White with Line Border per Mockup */}
       {!hideBottomNav && (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-20 border-t border-line bg-white pb-safe shadow-sm">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-20 border-t border-line bg-blue-tint-2 pb-safe shadow-[0_-6px_24px_rgba(15,43,92,0.08)]">
           {/* Home / Browse Tab */}
           {userType !== "caregiver" && (
             <Link

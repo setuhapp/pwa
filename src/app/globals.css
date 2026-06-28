@@ -106,6 +106,13 @@ input, select, textarea {
   font-size: 16px !important;
 }
 
+/* Prevent word clipping and horizontal overflows */
+h1, h2, h3, h4, h5, h6, p, span, label, select, button {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
 /* Hide scrollbars globally but allow scrolling */
 ::-webkit-scrollbar {
   display: none;
