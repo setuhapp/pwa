@@ -2,12 +2,38 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "SETUH",
+    id: "/",
+    name: "SETUH — Verified Elder Caregivers",
     short_name: "SETUH",
+    description: "Find Verified Elder Caregivers You Can Trust.",
     start_url: "/",
+    scope: "/",
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#2563eb",
-    icons: [{ src: "/icon.png", sizes: "512x512", type: "image/png" }],
+    orientation: "portrait",
+    lang: "en",
+    dir: "ltr",
+    categories: ["health", "medical", "lifestyle"],
+    background_color: "#f6f8f8",
+    theme_color: "#0f2b5c",
+    icons: [
+      {
+        src: "/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icon-maskable-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
+      },
+    ],
   };
 }

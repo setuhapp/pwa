@@ -15,9 +15,9 @@ export default async function Home() {
   const t = getTranslations(lang);
 
   return (
-    <main className="relative mx-auto flex min-h-screen max-w-md flex-col justify-center overflow-hidden bg-gradient-to-b from-blue-950 via-blue-950 to-blue-900 p-6 text-white">
+    <main className="relative mx-auto flex min-h-screen max-w-md flex-col justify-center overflow-hidden bg-gradient-to-b from-blue via-blue to-blue-dark p-6 text-white">
       {/* Decorative Blur */}
-      <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-blue-600/20 blur-[80px]" />
+      <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-brand-500/20 blur-[80px]" />
       <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-brand-500/20 blur-[80px]" />
 
       <div className="relative z-10 mb-8 flex flex-col items-center text-center">
@@ -37,7 +37,7 @@ export default async function Home() {
 
       <div className="relative z-10 flex flex-col gap-4 mt-4">
         {!isCaregiver && !isAdmin && (
-          <Link href="/browse" className="group relative flex items-center justify-center overflow-hidden rounded-2xl bg-white px-4 py-4 text-center text-lg font-bold text-blue-950 shadow-[0_0_40px_rgba(255,255,255,0.15)] transition-transform active:scale-[0.98]">
+          <Link href="/browse" className="group relative flex items-center justify-center overflow-hidden rounded-2xl bg-white px-4 py-4 text-center text-lg font-bold text-blue shadow-[0_0_40px_rgba(255,255,255,0.15)] transition-transform active:scale-[0.98]">
             <span className="relative z-10 flex items-center gap-2">
               {isAnon ? t.browse_caregivers : t.continue_browsing}
               <svg className="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>

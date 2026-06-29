@@ -41,7 +41,6 @@ export function NavigationShim({
   const isTopLevel =
     pathname === "/" ||
     pathname === "/browse" ||
-    pathname === "/messages" ||
     pathname === "/member/settings" ||
     pathname === "/caregiver";
 
@@ -150,21 +149,6 @@ export function NavigationShim({
               <span className="text-[11.5px] font-semibold tracking-wide">{t.nav_saved}</span>
             </Link>
           )}
-
-          {/* Messages Tab */}
-          <Link
-            href={userType === null ? "/login?role=member" : "/messages"}
-            className={`flex flex-1 flex-col items-center justify-center gap-1.5 transition-all duration-200 active:scale-95 ${
-              pathname.startsWith("/messages")
-                ? "text-blue"
-                : "text-ink-3 hover:text-blue"
-            }`}
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname.startsWith("/messages") ? 2.5 : 2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            <span className="text-[11.5px] font-semibold tracking-wide">{t.nav_messages}</span>
-          </Link>
 
           {/* Settings / Account Tab */}
           <Link

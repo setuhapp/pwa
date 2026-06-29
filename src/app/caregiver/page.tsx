@@ -7,6 +7,7 @@ import { CompletenessBar } from "@/components/CompletenessBar";
 import { toggleHidden } from "@/app/actions/caregiver";
 import { logout } from "@/app/actions/auth";
 import { CaregiverProfilePreview } from "@/components/CaregiverProfilePreview";
+import { AvailabilityEditor } from "@/components/AvailabilityEditor";
 import { cookies } from "next/headers";
 import { getTranslations } from "@/lib/translations";
 
@@ -54,7 +55,13 @@ export default async function CaregiverDashboard() {
         </form>
       </section>
 
-      
+      {/* Availability control */}
+      <AvailabilityEditor
+        availabilityStatus={cg.availabilityStatus}
+        engagedFrom={cg.engagedFrom}
+        engagedTo={cg.engagedTo}
+        lang={lang}
+      />
 
       {/* Separator / Preview Header */}
       <div className="flex items-center gap-3 py-2">

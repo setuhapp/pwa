@@ -14,7 +14,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 import type { Metadata, Viewport } from "next";
 
 export const viewport: Viewport = {
-  themeColor: "#172554",
+  themeColor: "#0f2b5c",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

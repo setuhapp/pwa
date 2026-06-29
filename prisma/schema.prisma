@@ -22,6 +22,9 @@ model Caregiver {
   specialisations String?  // JSON array
   languages       String?  // JSON array
   availability    String?  // live-in | part-time
+  availabilityStatus String @default("available") // available | engaged
+  engagedFrom     DateTime?
+  engagedTo       DateTime?
   dailyRate       Int?
   monthlyRate     Int?
   isHidden        Boolean  @default(false)

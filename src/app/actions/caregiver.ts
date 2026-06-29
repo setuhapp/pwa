@@ -19,6 +19,28 @@ function optionalNumber(value: FormDataEntryValue | null): number | null {
   return Number.isNaN(n) ? null : n;
 }
 
+// Parse an <input type="date"> value ("YYYY-MM-DD") into a Date, or null if blank/invalid.
+function optionalDate(value: FormDataEntryValue | null): Date | null {
+  const s = String(value ?? "").trim();
+  if (s === "") return null;
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+export async function setAvailability(formData: FormData) {
+  const id = await requireCaregiver();
+  const status = String(formData.get("availabilityStatus") ?? "available") === "engaged" ? "engaged" : "available";
+  // When available, clear any stale engagement dates.
+  const engagedFrom = status === "engaged" ? optionalDate(formData.get("engagedFrom")) : null;
+  const engagedTo = status === "engaged" ? optionalDate(formData.get("engagedTo")) : null;
+  await db.caregiver.update({
+    where: { id },
+    data: { availabilityStatus: status, engagedFrom, engagedTo },
+  });
+  revalidatePath("/caregiver");
+  revalidatePath("/browse");
+}
+
 export async function saveStep1(formData: FormData) {
   const id = await requireCaregiver();
   const photo = formData.get("photo") as File | null;

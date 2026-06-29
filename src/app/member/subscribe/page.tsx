@@ -84,8 +84,8 @@ export default async function SubscribePage() {
           </h1>
           <p className="mt-3 text-sm font-medium text-gray-500 leading-relaxed px-2">
             {lang === "ta" 
-              ? "முழு விவரங்களைப் பார்க்கவும், செய்திகளை அனுப்பவும் மற்றும் சிறந்த பராமரிப்பாளர்களைக் கண்டறியவும் பிரீமியம் சந்தாவுக்கு மாறவும்." 
-              : "Upgrade to premium membership to view caregiver details, send in-app messages, and find the perfect match for your family."}
+              ? "முழு விவரங்களைப் பார்க்கவும், வாட்ஸ்அப்பில் தொடர்பு கொள்ளவும் மற்றும் சிறந்த பராமரிப்பாளர்களைக் கண்டறியவும் பிரீமியம் சந்தாவுக்கு மாறவும்."
+              : "Upgrade to premium membership to view caregiver details, contact them on WhatsApp, and find the perfect match for your family."}
           </p>
 
           {/* Pricing & QR card */}

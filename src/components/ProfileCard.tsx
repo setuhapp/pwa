@@ -3,6 +3,7 @@ import { type PublicCaregiver } from "@/lib/serializers";
 import type { Caregiver } from "@prisma/client";
 import { TiltCard } from "@/components/TiltCard";
 import { translateCity, translateSpecialty } from "@/lib/translations";
+import { availabilityLabel } from "@/lib/availability";
 
 export function ProfileCard({ caregiver, lang = "en" }: { caregiver: PublicCaregiver | Caregiver; lang?: string }) {
   const isPublic = !("name" in caregiver);
@@ -50,6 +51,15 @@ export function ProfileCard({ caregiver, lang = "en" }: { caregiver: PublicCareg
                 </span>
               )}
             </div>
+            {(() => {
+              const av = availabilityLabel(caregiver, lang);
+              return (
+                <span className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ${av.available ? "bg-green-tint text-green" : "bg-coral-tint text-coral"}`}>
+                  <span className={`h-1.5 w-1.5 rounded-full ${av.available ? "bg-green" : "bg-coral"}`} />
+                  {av.text}
+                </span>
+              );
+            })()}
           </div>
         </div>
 
