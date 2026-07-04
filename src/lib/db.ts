@@ -1,4 +1,5 @@
-import "dotenv/config";
+import { loadEnvConfig } from "@next/env";
+loadEnvConfig(process.cwd(), process.env["NODE_ENV"] !== "production");
 import { PrismaClient } from "@prisma/client";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
