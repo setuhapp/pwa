@@ -36,10 +36,8 @@ async function twilioPost(path: string, body: Record<string, string>): Promise<R
   });
 }
 
-// OTP is delivered over WhatsApp only (no SMS). India recipients have WhatsApp
-// near-universally, and this avoids India's TRAI/DLT SMS registration entirely.
-// The WhatsApp sender is configured on the Verify Service in the Twilio console.
-const VERIFY_CHANNEL = "whatsapp";
+// OTP is delivered over SMS.
+const VERIFY_CHANNEL = "sms";
 
 // Sends an OTP. In dev mode this is a no-op that logs the code to the server console.
 export async function sendOtp(phone: string): Promise<{ ok: boolean; error?: string }> {
