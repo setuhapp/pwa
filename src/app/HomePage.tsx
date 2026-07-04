@@ -46,6 +46,8 @@ export function HomePageClient({ session, tier, t }: HomePageClientProps) {
           <p className="mt-2 text-lg font-medium text-blue-100/90 leading-snug">
             {t.tagline || "Connecting families with specialized caregivers."}
           </p>
+
+          <InstallButton />
         </div>
 
         {isStandalone ? (
@@ -106,12 +108,7 @@ export function HomePageClient({ session, tier, t }: HomePageClientProps) {
               <p>
                 SETUH is a platform dedicated to connecting families in Chennai seeking caregiver assistance for dementia, elderly care, and support attender needs with verified, experienced, and trait-led caregivers.
               </p>
-              <p className="mt-2 text-xs text-blue-200/70">
-                To browse caregivers or log in, please install the SETUH application onto your home screen using the button below.
-              </p>
             </div>
-
-            <InstallButton />
 
             <div className="mt-4 flex flex-col items-center gap-2">
               <Link

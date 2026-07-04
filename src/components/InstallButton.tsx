@@ -14,17 +14,21 @@ export function InstallButton() {
   if (isStandalone) return null;
 
   const handleInstallClick = async () => {
-    // If we caught the native Android prompt, use it
+    // Always trigger our custom instruction banner/message first so it immediately displays
+    window.dispatchEvent(new Event('show-install-prompt'));
+
+    // If we caught the native browser prompt, trigger it on top of the banner
     if ((window as any).deferredInstallPrompt) {
-      const promptEvent = (window as any).deferredInstallPrompt;
-      promptEvent.prompt();
-      const { outcome } = await promptEvent.userChoice;
-      if (outcome === 'accepted') {
-        (window as any).deferredInstallPrompt = null;
+      try {
+        const promptEvent = (window as any).deferredInstallPrompt;
+        promptEvent.prompt();
+        const { outcome } = await promptEvent.userChoice;
+        if (outcome === 'accepted') {
+          (window as any).deferredInstallPrompt = null;
+        }
+      } catch (err) {
+        console.error("Error showing native install prompt:", err);
       }
-    } else {
-      // Otherwise (like on iOS), trigger our custom instruction banner
-      window.dispatchEvent(new Event('show-install-prompt'));
     }
   };
 

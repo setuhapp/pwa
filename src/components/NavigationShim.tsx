@@ -21,18 +21,33 @@ export function NavigationShim({
   const pathname = usePathname();
   const router = useRouter();
   const [canGoBack, setCanGoBack] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
 
   const t = getTranslations(lang);
 
   useEffect(() => {
     setCanGoBack(window.history.length > 2); // basic check for back history
-  }, [pathname]);
+
+    const standalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true;
+    setIsStandalone(standalone);
+
+    // Enforce PWA-only access for browsing, login, settings, and caregivers profile
+    if (!standalone) {
+      const blockedPaths = ["/browse", "/login", "/member", "/caregiver", "/c/"];
+      if (blockedPaths.some(p => pathname === p || pathname.startsWith(p))) {
+        router.replace("/");
+      }
+    }
+  }, [pathname, router]);
 
   // Pages where we don't want the bottom nav to save screen space
   const hideBottomNav =
     userType === "admin" ||
     pathname === "/login" ||
-    pathname.startsWith("/caregiver/onboarding");
+    pathname.startsWith("/caregiver/onboarding") ||
+    (pathname === "/" && !isStandalone);
 
   // Pages where we don't want the top nav (because they have large desktop headers or are admin panels)
   const hideTopNav = pathname.startsWith("/admin");

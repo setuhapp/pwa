@@ -89,6 +89,12 @@ export function LoginForm({ role, isDev }: { role: string; isDev: boolean }) {
           >
             {busy ? "Sending…" : "Continue"}
           </button>
+          <p className="mt-1 text-center text-xs text-gray-500">
+            By continuing, you agree to our{" "}
+            <a href="/terms" className="font-bold underline hover:text-blue">
+              Terms & Conditions
+            </a>.
+          </p>
         </form>
       ) : (
         <form onSubmit={(e) => { e.preventDefault(); submitCode(code); }} className="flex flex-col gap-3">
@@ -115,10 +121,16 @@ export function LoginForm({ role, isDev }: { role: string; isDev: boolean }) {
           >
             {busy ? "Verifying…" : "Verify & Continue"}
           </button>
+          <p className="mt-1 text-center text-xs text-gray-500">
+            By continuing, you agree to our{" "}
+            <a href="/terms" className="font-bold underline hover:text-blue">
+              Terms & Conditions
+            </a>.
+          </p>
           <button
             type="button"
             onClick={() => { setStep("phone"); setCode(""); setError(null); }}
-            className="text-sm text-gray-500 underline"
+            className="text-sm text-gray-500 underline mt-2"
           >
             Change number
           </button>
