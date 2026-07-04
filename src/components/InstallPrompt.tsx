@@ -115,7 +115,7 @@ export function InstallPrompt() {
           <div className="flex-1 pr-6">
             <h3 className="text-sm font-bold text-gray-900">Install SETUH App</h3>
             <p className="mt-0.5 text-xs font-medium text-gray-500 leading-tight">
-              Tap the <strong className="text-gray-700">Menu (⋮)</strong> above, then select <strong className="text-gray-700">&quot;Install app&quot;</strong>.
+              Check the <strong className="text-gray-700">Home screen  </strong> after clicking the <strong className="text-gray-700">&quot;Install App button &quot;</strong>.
             </p>
           </div>
         </div>

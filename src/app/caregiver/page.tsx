@@ -83,12 +83,9 @@ export default async function CaregiverDashboard() {
       />
 
       {/* Logout Action */}
-      <div className="mt-2">
+      <div className="mt-8 flex justify-center">
         <form action={logout}>
-          <button className="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50/50 px-4 py-4 text-base font-bold text-red-600 shadow-sm transition-transform active:scale-[0.98] hover:bg-red-50 hover:text-red-700">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
+          <button className="text-[10px] font-medium text-gray-300 hover:text-gray-500 hover:underline active:scale-[0.98] transition-all">
             {t.logout || "Log Out"}
           </button>
         </form>

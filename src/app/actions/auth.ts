@@ -19,7 +19,7 @@ export async function requestOtp(_role: string, phone: string): Promise<{ ok: bo
 }
 
 // Step 2: verify the OTP and create a session. Redirects on success.
-export async function verifyOtp(rawRole: string, phone: string, code: string): Promise<{ ok: boolean; error?: string }> {
+export async function verifyOtp(rawRole: string, phone: string, code: string): Promise<{ ok: boolean; error?: string; existingRole?: string }> {
   const trimmed = phone.trim();
   if (!trimmed) return { ok: false, error: "missing_phone" };
 
@@ -28,79 +28,48 @@ export async function verifyOtp(rawRole: string, phone: string, code: string): P
 
   const role = normalizeRole(rawRole);
 
-  // 1. Try to find the user in the selected role table first (takes 1 query for correct route logins).
-  let userId = "";
-  let activeRole = role;
-  let caregiverName: string | null = null;
+  // 1. Fetch user status across all roles in parallel
+  const [admin, caregiver, member] = await Promise.all([
+    db.admin.findUnique({ where: { phone: trimmed } }),
+    db.caregiver.findUnique({ where: { phone: trimmed } }),
+    db.member.findUnique({ where: { phone: trimmed } }),
+  ]);
 
-  if (role === "caregiver") {
-    const cg = await db.caregiver.findUnique({ where: { phone: trimmed } });
-    if (cg) {
-      userId = cg.id;
-      caregiverName = cg.name;
-    }
-  } else if (role === "admin") {
-    const a = await db.admin.findUnique({ where: { phone: trimmed } });
-    if (a) {
-      userId = a.id;
-    }
-  } else {
-    const m = await db.member.findUnique({ where: { phone: trimmed } });
-    if (m) {
-      userId = m.id;
-    }
-  }
+  const existingRole = admin ? "admin" : caregiver ? "caregiver" : member ? "member" : null;
+  const existingUser = admin || caregiver || member;
 
-  // 2. If not found in the selected table, check the other tables for an existing sticky role.
-  if (!userId) {
-    if (role !== "caregiver") {
-      const cg = await db.caregiver.findUnique({ where: { phone: trimmed } });
-      if (cg) {
-        userId = cg.id;
-        activeRole = "caregiver";
-        caregiverName = cg.name;
-      }
+  // 2. If user exists, enforce strict role matching
+  if (existingUser && existingRole) {
+    if (existingRole !== role) {
+      return { ok: false, error: "role_mismatch", existingRole };
     }
-    if (!userId && role !== "admin") {
-      const a = await db.admin.findUnique({ where: { phone: trimmed } });
-      if (a) {
-        userId = a.id;
-        activeRole = "admin";
-      }
-    }
-    if (!userId && role !== "member") {
-      const m = await db.member.findUnique({ where: { phone: trimmed } });
-      if (m) {
-        userId = m.id;
-        activeRole = "member";
-      }
-    }
-  }
-
-  // 3. If still not found anywhere, this is a new signup under the selected role.
-  if (!userId) {
-    if (role === "caregiver") {
-      const cg = await db.caregiver.upsert({ where: { phone: trimmed }, update: {}, create: { phone: trimmed } });
-      await createSession("caregiver", cg.id);
-      redirect(cg.name ? "/caregiver" : "/caregiver/onboarding/1");
-    } else if (role === "admin") {
-      const a = await db.admin.upsert({ where: { phone: trimmed }, update: {}, create: { phone: trimmed } });
-      await createSession("admin", a.id);
+    
+    // Valid login: Create session and redirect
+    await createSession(existingRole, existingUser.id);
+    if (existingRole === "admin") {
       redirect("/admin");
+    } else if (existingRole === "caregiver") {
+      redirect(caregiver?.name ? "/caregiver" : "/caregiver/onboarding/1");
     } else {
-      const m = await db.member.upsert({ where: { phone: trimmed }, update: {}, create: { phone: trimmed } });
-      await createSession("member", m.id);
       redirect("/browse");
     }
   }
 
-  // 4. Authenticate and redirect based on the resolved existing sticky role.
-  await createSession(activeRole, userId);
-  if (activeRole === "caregiver") {
-    redirect(caregiverName ? "/caregiver" : "/caregiver/onboarding/1");
-  } else if (activeRole === "admin") {
+  // 3. New Signup (does not exist under any role)
+  if (role === "admin") {
+    if (process.env.NODE_ENV === "production") {
+      return { ok: false, error: "admin_signup_disabled" };
+    }
+    const a = await db.admin.create({ data: { phone: trimmed } });
+    await createSession("admin", a.id);
     redirect("/admin");
+  } else if (role === "caregiver") {
+    const cg = await db.caregiver.create({ data: { phone: trimmed } });
+    await createSession("caregiver", cg.id);
+    redirect("/caregiver/onboarding/1");
   } else {
+    const m = await db.member.create({ data: { phone: trimmed } });
+    await createSession("member", m.id);
     redirect("/browse");
   }
 }

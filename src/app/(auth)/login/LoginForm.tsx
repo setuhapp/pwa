@@ -34,7 +34,21 @@ export function LoginForm({ role, isDev }: { role: string; isDev: boolean }) {
     try {
       const res = await verifyOtp(role, phone.trim(), value);
       // On success the server action redirects; we only get here on failure.
-      if (res && !res.ok) setError("Wrong code. Please try again.");
+      if (res && !res.ok) {
+        if (res.error === "admin_signup_disabled") {
+          setError("Administrator signup is disabled in production.");
+        } else if (res.error === "role_mismatch") {
+          const roleNames: Record<string, string> = {
+            caregiver: "Caregiver",
+            member: "Family Member",
+            admin: "Administrator",
+          };
+          const name = roleNames[res.existingRole || ""] || "another role";
+          setError(`This phone number is already registered as a ${name}. Please log in using the correct portal.`);
+        } else {
+          setError("Wrong code. Please try again.");
+        }
+      }
     } catch {
       // NEXT_REDIRECT bubbles up as an error in some runtimes — that's success.
     } finally {

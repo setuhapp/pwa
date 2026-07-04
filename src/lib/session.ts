@@ -10,7 +10,7 @@ export async function createSession(userType: "caregiver" | "member" | "admin", 
     httpOnly: true, 
     sameSite: "lax", 
     path: "/",
-    maxAge: 60 * 60 * 24 * 30, // 30 days
+    maxAge: 60 * 60 * 24 * 365 * 10, // 10 years (never log out)
   });
 }
 
