@@ -87,14 +87,29 @@ OTP `000000` to log in.
 - **Admin Login:** The seed script creates an Admin account with the phone
   number `9000000000`. Login with this number to access the Admin tier.
 
-## Vercel Deployment
+## Vercel & Supabase Deployment
 
-1. Connect the repository to Vercel.
-2. In Vercel Project Settings, provision a **Supabase** database (or Vercel
-   Postgres) and a **Vercel Blob** store.
-3. Ensure `DATABASE_URL` and `BLOB_READ_WRITE_TOKEN` are set in the Vercel
-   Environment Variables.
-4. Vercel will automatically build the Next.js app and run the required Prisma
-   generations.
+1. **Database Schema Push**:
+   Before deploying, push the database schema to your Supabase instance:
+   ```bash
+   npx prisma db push
+   ```
+   *(Optional)* To seed the database with mock caregiver, member, admin, and engagement data:
+   ```bash
+   npm run db:seed
+   ```
+
+2. **Connect to Vercel**:
+   Import your repository into Vercel as a Next.js project.
+
+3. **Configure Environment Variables**:
+   In your Vercel Project Settings, add the following Environment Variables:
+   - `DATABASE_URL`: Your Supabase Transaction Pooler connection string (port 6543).
+   - `DIRECT_URL`: Your Supabase Direct Connection string (port 5432).
+   - `BLOB_READ_WRITE_TOKEN`: Your Vercel Blob store token (for caregiver photo uploads).
+   - `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_VERIFY_SERVICE_SID`: (Optional) For WhatsApp OTP authentication. If left blank, login falls back to dev mode (any phone number, OTP `000000`).
+
+4. **Build & Deploy**:
+   Vercel will automatically trigger a build, install dependencies, run the `postinstall` script to generate the Prisma client, and deploy the application.
 
 PWA : npm run build && npx next start -p 3001
