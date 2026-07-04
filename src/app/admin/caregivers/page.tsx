@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { VerifyButton } from "./VerifyButton";
+import { AdminSummaryEditor } from "./AdminSummaryEditor";
 
 export default async function AdminCaregiversPage() {
   const { session } = await getViewer();
@@ -29,6 +30,7 @@ export default async function AdminCaregiversPage() {
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Summary</th>
               <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
             </tr>
           </thead>
@@ -56,7 +58,10 @@ export default async function AdminCaregiversPage() {
                       {isVerified ? "Verified" : "Pending"}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                  <td className="px-6 py-4 align-top">
+                    <AdminSummaryEditor caregiverId={cg.id} summary={cg.summary} />
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium align-top">
                     <VerifyButton caregiverId={cg.id} isVerified={isVerified} />
                   </td>
                 </tr>
@@ -64,7 +69,7 @@ export default async function AdminCaregiversPage() {
             })}
             {caregivers.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-sm text-gray-500">No caregivers found.</td>
+                <td colSpan={6} className="px-6 py-8 text-center text-sm text-gray-500">No caregivers found.</td>
               </tr>
             )}
           </tbody>

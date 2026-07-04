@@ -51,6 +51,7 @@ export async function saveStep1(formData: FormData) {
       name: String(formData.get("name") ?? ""),
       address: String(formData.get("address") ?? ""),
       city: String(formData.get("city") ?? ""),
+      summary: String(formData.get("summary") ?? ""),
       ...(photoUrl ? { photoUrl } : {}),
     },
   });
@@ -83,6 +84,7 @@ export async function saveStep3(formData: FormData) {
     data: {
       experienceYears: optionalNumber(formData.get("experienceYears")),
       priorFamilies: String(formData.get("priorFamilies") ?? ""),
+      workHistory: String(formData.get("workHistory") ?? ""),
       specialisations: JSON.stringify(formData.getAll("specialisations").map(String)),
       availability: String(formData.get("availability") ?? ""),
     },

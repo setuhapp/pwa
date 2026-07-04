@@ -21,6 +21,8 @@ model Caregiver {
   priorFamilies   String?
   specialisations String?  // JSON array
   languages       String?  // JSON array
+  summary         String?  // ~2-line trait-led blurb (caregiver draft, SETUH polish)
+  workHistory     String?  // free-format work history, one event per line
   availability    String?  // live-in | part-time
   availabilityStatus String @default("available") // available | engaged
   engagedFrom     DateTime?
@@ -65,6 +67,7 @@ model Session {
 model Verification {
   id          String    @id @default(cuid())
   caregiverId String
+  createdAt   DateTime  @default(now())
   caregiver   Caregiver @relation(fields: [caregiverId], references: [id])
 }
 

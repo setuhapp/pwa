@@ -34,6 +34,7 @@ export default async function PublicProfile({
 
   const cg = canSeeDetails ? toFullCaregiver(rawCg) : toPublicCaregiver(rawCg);
   const isVerified = rawCg.verifications.length > 0;
+  const verifiedAt = rawCg.verifications[0]?.createdAt ?? null;
   const lang = (await cookies()).get("lang")?.value || "en";
 
   let isBookmarked = false;
@@ -55,6 +56,7 @@ export default async function PublicProfile({
         isOwnProfile={session?.userType === "caregiver" && session.userId === rawCg.id}
         isLoggedIn={!!session}
         isVerified={isVerified}
+        verifiedAt={verifiedAt}
         isBookmarked={isBookmarked}
         lang={lang}
       />

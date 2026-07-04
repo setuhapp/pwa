@@ -5,6 +5,7 @@ import { getViewer } from "@/lib/session";
 import { CITIES, SKILL_TAGS, SPECIALISATIONS, AVAILABILITY, LANGUAGES } from "@/lib/constants";
 import { saveStep1, saveStep2, saveStep3, saveStep4 } from "@/app/actions/caregiver";
 import { parseStringArray } from "@/lib/json";
+import { getTranslations } from "@/lib/translations";
 import { cookies } from "next/headers";
 
 export default async function OnboardingStep({
@@ -25,6 +26,7 @@ export default async function OnboardingStep({
   const inputClass = "w-full rounded-xl border px-4 py-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-500";
   const labelClass = "flex flex-col gap-1 text-sm font-medium text-gray-700";
   const lang = (await cookies()).get("lang")?.value || "en";
+  const t = getTranslations(lang);
 
   return (
     <main className="mx-auto flex max-w-md w-full flex-col gap-6 p-6 pb-12">
@@ -89,6 +91,17 @@ export default async function OnboardingStep({
                   </option>
                 ))}
               </select>
+            </label>
+            <label className={labelClass}>
+              {t.about_you}
+              <textarea
+                name="summary"
+                defaultValue={cg.summary ?? ""}
+                rows={3}
+                placeholder="e.g. Speaks English & Tamil, 8 years in dementia care, known for patience."
+                className={inputClass}
+              />
+              <span className="text-xs font-normal text-gray-400">{t.about_you_help}</span>
             </label>
             <button className="mt-2 rounded-xl bg-blue px-4 py-4 text-lg font-semibold text-white">
               Save
@@ -182,6 +195,17 @@ export default async function OnboardingStep({
                 placeholder="e.g. 3 families over 4 years"
                 className={inputClass}
               />
+            </label>
+            <label className={labelClass}>
+              {t.work_history}
+              <textarea
+                name="workHistory"
+                defaultValue={cg.workHistory ?? ""}
+                rows={4}
+                placeholder={"2022–2024  Live-in, dementia care (Sharma family)\n2019–2022  Part-time, post-op recovery"}
+                className={inputClass}
+              />
+              <span className="text-xs font-normal text-gray-400">{t.work_history_help}</span>
             </label>
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium text-gray-700">Specialisations</span>

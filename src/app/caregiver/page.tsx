@@ -23,6 +23,7 @@ export default async function CaregiverDashboard() {
 
   const percent = profileCompleteness(cg);
   const isVerified = cg.verifications.length > 0;
+  const verifiedAt = cg.verifications[0]?.createdAt ?? null;
   const lang = (await cookies()).get("lang")?.value || "en";
   const t = getTranslations(lang);
 
@@ -77,6 +78,7 @@ export default async function CaregiverDashboard() {
         isOwnProfile={true}
         isLoggedIn={true}
         isVerified={isVerified}
+        verifiedAt={verifiedAt}
         lang={lang}
       />
 

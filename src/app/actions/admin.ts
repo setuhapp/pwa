@@ -8,6 +8,14 @@ async function requireAdmin() {
   if (session?.userType !== "admin") throw new Error("Unauthorized");
 }
 
+export async function updateCaregiverSummary(caregiverId: string, summary: string) {
+  await requireAdmin();
+  await db.caregiver.update({ where: { id: caregiverId }, data: { summary } });
+  revalidatePath("/admin/caregivers");
+  revalidatePath(`/c/${caregiverId}`);
+  revalidatePath("/browse");
+}
+
 export async function verifyCaregiver(caregiverId: string) {
   await requireAdmin();
   

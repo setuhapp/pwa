@@ -1,10 +1,10 @@
 import Link from "next/link";
 import type { Caregiver } from "@prisma/client";
 import { type PublicCaregiver } from "@/lib/serializers";
-import { parseStringArray } from "@/lib/json";
-import { getTranslations, translateCity, translateSpecialty } from "@/lib/translations";
+import { getTranslations, translateCity } from "@/lib/translations";
 import { availabilityLabel } from "@/lib/availability";
 import { whatsappLink } from "@/lib/whatsapp";
+import { ProfileTabs } from "@/components/ProfileTabs";
 import { toggleBookmarkAction } from "@/app/actions/member";
 
 interface CaregiverProfilePreviewProps {
@@ -13,6 +13,7 @@ interface CaregiverProfilePreviewProps {
   isOwnProfile?: boolean;
   isLoggedIn?: boolean;
   isVerified?: boolean;
+  verifiedAt?: Date | string | null;
   isBookmarked?: boolean;
   lang?: string;
 }
@@ -32,20 +33,18 @@ export function CaregiverProfilePreview({
   isOwnProfile = false,
   isLoggedIn = false,
   isVerified = false,
+  verifiedAt = null,
   isBookmarked = false,
   lang = "en"
 }: CaregiverProfilePreviewProps) {
   const cg = caregiver;
-  const skills = parseStringArray(cg.skills);
-  const specs = parseStringArray(cg.specialisations);
-  const langs = parseStringArray("languages" in cg ? cg.languages : null);
   const t = getTranslations(lang);
 
   // Expose fields conditionally based on access tier
   const phone = "phone" in cg ? cg.phone : null;
   const name = "name" in cg ? cg.name : null;
   const photoUrl = "photoUrl" in cg ? cg.photoUrl : null;
-  const address = "address" in cg ? cg.address : null;
+  const summary = cg.summary;
 
   const displayName = canSeeDetails ? (name || "Anonymous Caregiver") : (lang === "ta" ? "பிரீமியம் பராமரிப்பாளர்" : "Premium Caregiver");
   const initials = getInitials(name);
@@ -130,6 +129,13 @@ export function CaregiverProfilePreview({
         </div>
       </div>
 
+      {/* SUMMARY — always visible, the conversion hook */}
+      {summary && (
+        <div className="mt-3.5 bg-white rounded-[18px] p-[18px] shadow-sm border border-line/30">
+          <p className="text-[15px] leading-relaxed text-ink-2 font-medium">{summary}</p>
+        </div>
+      )}
+
       {/* 1.1 LOCK BANNER (If Free Tier) */}
       {!canSeeDetails && (
         <div className="lock-banner mx-0 mt-3.5 bg-gradient-to-br from-blue to-blue-dark rounded-[18px] p-[18px] text-white flex items-center gap-[14px] shadow-sm select-none">
@@ -143,170 +149,14 @@ export function CaregiverProfilePreview({
         </div>
       )}
 
-      {/* 2. SKILLS & EXPERTISE CARD */}
-      <div className="section bg-white mx-0 mt-3.5 rounded-[18px] p-[18px] shadow-sm border border-line/30">
-        <div className="section-head flex items-center gap-[9px] mb-[15px] select-none">
-          <div className="section-ic w-[30px] h-[30px] rounded-[9px] bg-coral-tint flex items-center justify-center text-[15px] flex-shrink-0">
-            🩺
-          </div>
-          <div className="section-title text-[15px] font-bold tracking-tight text-ink">
-            {t.skills_expertise}
-          </div>
-        </div>
-
-        {skills.length > 0 && (
-          <div className="mb-4">
-            <div className="chip-label text-[12px] font-bold text-ink-3 mb-[9px] tracking-wider uppercase">{t.core_skills}</div>
-            <div className="chips flex flex-wrap gap-2">
-              {skills.map((s) => (
-                <span key={s} className="chip py-2 px-3.5 rounded-[11px] text-[13.5px] font-bold bg-coral-tint text-coral leading-none">
-                  {s === "bedridden" ? (lang === "ta" ? "படுக்கை நோயாளி" : "Bedridden") : s === "injection" ? (lang === "ta" ? "ஊசி போடுதல்" : "Injection") : s === "mobility-assist" ? (lang === "ta" ? "இயக்க உதவி" : "Mobility-assist") : s}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {specs.length > 0 && (
-          <div>
-            <div className="chip-label text-[12px] font-bold text-ink-3 mb-[9px] tracking-wider uppercase">{t.specialisations}</div>
-            <div className="chips flex flex-wrap gap-2">
-              {specs.map((s) => (
-                <span key={s} className="chip spec py-2 px-3.5 rounded-[11px] text-[13.5px] font-bold bg-[#efe9fb] text-[#6d4aae] leading-none">
-                  {s === "bedridden" ? (lang === "ta" ? "படுக்கை நோயாளி" : "Bedridden") : s === "post-op" ? (lang === "ta" ? "அறுவை சிகிச்சைக்கு பின்" : "Post-op") : s}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {skills.length === 0 && specs.length === 0 && (
-          <p className="text-sm text-ink-3 text-center py-2">{t.no_skills}</p>
-        )}
-      </div>
-
-      {/* 2.1 LANGUAGES KNOWN CARD */}
-      {langs.length > 0 && (
-        <div className="section bg-white mx-0 mt-3.5 rounded-[18px] p-[18px] shadow-sm border border-line/30">
-          <div className="section-head flex items-center gap-[9px] mb-[15px] select-none">
-            <div className="section-ic w-[30px] h-[30px] rounded-[9px] bg-indigo-50 flex items-center justify-center text-[15px] flex-shrink-0">
-              🗣️
-            </div>
-            <div className="section-title text-[15px] font-bold tracking-tight text-ink">
-              {lang === "ta" ? "அறிந்த மொழிகள்" : "Languages known"}
-            </div>
-          </div>
-          <div className="chips flex flex-wrap gap-2">
-            {langs.map((l) => (
-              <span key={l} className="chip py-2 px-3.5 rounded-[11px] text-[13.5px] font-bold bg-indigo-50 text-indigo-700 leading-none">
-                {l === "English" ? (lang === "ta" ? "ஆங்கிலம்" : "English") : l === "Tamil" ? (lang === "ta" ? "தமிழ்" : "Tamil") : l === "Hindi" ? (lang === "ta" ? "இந்தி" : "Hindi") : l === "Malayalam" ? (lang === "ta" ? "மலையாளம்" : "Malayalam") : l === "Kannada" ? (lang === "ta" ? "கன்னடம்" : "Kannada") : l}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 3. VERIFICATION TIMELINE CARD */}
-      <div className="section bg-white mx-0 mt-3.5 rounded-[18px] p-[18px] shadow-sm border border-line/30">
-        <div className="section-head flex items-center gap-[9px] mb-[15px] select-none">
-          <div className="section-ic w-[30px] h-[30px] rounded-[9px] bg-green-tint flex items-center justify-center text-[15px] flex-shrink-0">
-            🛡️
-          </div>
-          <div>
-            <div className="section-title text-[15px] font-bold tracking-tight text-ink">
-              {lang === "ta" ? "சரிபார்ப்பு விவரங்கள்" : "Verification details"}
-            </div>
-            <div className="section-sub text-[12.5px] text-ink-3 font-semibold mt-0.5">
-              {lang === "ta" ? "சரிபார்க்கப்பட்டவை மற்றும் தேதி" : "What we checked, and when"}
-            </div>
-          </div>
-        </div>
-
-        {/* Verification rows */}
-        <div className="flex flex-col">
-          <div className="vrow flex items-center gap-3 py-3 border-b border-line">
-            <div className={`vcheck w-[26px] h-[26px] rounded-lg flex items-center justify-center text-[13px] font-extrabold flex-shrink-0 ${isVerified ? "bg-green-tint text-green" : "bg-[#fbf1e0] text-amber"}`}>
-              {isVerified ? "✓" : "!"}
-            </div>
-            <div className="vlabel flex-1 text-sm font-bold text-ink">
-              {lang === "ta" ? "ஆதார் கார்டு அடையாளம்" : "Aadhaar identity check"}
-            </div>
-            <div className="vdate text-xs text-ink-3 font-semibold">
-              {isVerified ? (lang === "ta" ? "மே 2025" : "May 2025") : (lang === "ta" ? "நிலுவையில் உள்ளது" : "Pending")}
-            </div>
-          </div>
-
-          <div className="vrow flex items-center gap-3 py-3 border-b border-line">
-            <div className={`vcheck w-[26px] h-[26px] rounded-lg flex items-center justify-center text-[13px] font-extrabold flex-shrink-0 ${isVerified ? "bg-green-tint text-green" : "bg-[#fbf1e0] text-amber"}`}>
-              {isVerified ? "✓" : "!"}
-            </div>
-            <div className="vlabel flex-1 text-sm font-bold text-ink">
-              {lang === "ta" ? "பின்னணி சரிபார்ப்பு" : "Background check"}
-            </div>
-            <div className="vdate text-xs text-ink-3 font-semibold">
-              {isVerified ? (lang === "ta" ? "மே 2025" : "May 2025") : (lang === "ta" ? "நிலுவையில் உள்ளது" : "Pending")}
-            </div>
-          </div>
-
-          <div className="vrow flex items-center gap-3 py-3 border-b border-line">
-            <div className={`vcheck w-[26px] h-[26px] rounded-lg flex items-center justify-center text-[13px] font-extrabold flex-shrink-0 ${isVerified ? "bg-green-tint text-green" : "bg-[#fbf1e0] text-amber"}`}>
-              {isVerified ? "✓" : "!"}
-            </div>
-            <div className="vlabel flex-1 text-sm font-bold text-ink">
-              {lang === "ta" ? "பரிந்துரைகள் சரிபார்க்கப்பட்டது" : "References called"}
-            </div>
-            <div className="vdate text-xs text-ink-3 font-semibold">
-              {isVerified ? (lang === "ta" ? "ஏப் 2025" : "Apr 2025") : (lang === "ta" ? "நிலுவையில் உள்ளது" : "Pending")}
-            </div>
-          </div>
-
-          <div className="vrow flex items-center gap-3 py-3">
-            <div className="vcheck pending w-[26px] h-[26px] rounded-lg bg-[#fbf1e0] text-amber flex items-center justify-center text-[13px] font-extrabold flex-shrink-0">
-              !
-            </div>
-            <div className="vlabel flex-1 text-sm font-bold text-ink">
-              {lang === "ta" ? "அடுத்த சரிபார்ப்பு சுழற்சி" : "Next verification cycle"}
-            </div>
-            <div className="vdate text-xs text-ink-3 font-semibold">
-              {lang === "ta" ? "ஏப் 2026" : "Due Apr 2026"}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 4. EXPECTED RATE CARD */}
-      <div className="section bg-white mx-0 mt-3.5 rounded-[18px] p-[18px] shadow-sm border border-line/30">
-        <div className="section-head flex items-center gap-[9px] mb-[15px] select-none">
-          <div className="section-ic w-[30px] h-[30px] rounded-[9px] bg-blue-tint flex items-center justify-center text-[15px] flex-shrink-0">
-            💰
-          </div>
-          <div>
-            <div className="section-title text-[15px] font-bold tracking-tight text-ink">
-              {t.expected_pricing}
-            </div>
-            <div className="section-sub text-[12.5px] text-ink-3 font-semibold mt-0.5">
-              {lang === "ta" ? "பராமரிப்பாளரால் நிர்ணயிக்கப்பட்டது" : "Set by the caregiver"}
-            </div>
-          </div>
-        </div>
-
-        <div className="rate-grid flex gap-2.5">
-          <div className="rate-card flex-1 border border-line rounded-[14px] p-3.5">
-            <div className="rlbl text-[12px] text-ink-3 font-semibold">{t.daily_rate}</div>
-            <div className="rval text-[21px] font-extrabold text-ink mt-1 tracking-tight">
-              {cg.dailyRate ? `₹${cg.dailyRate.toLocaleString()}` : "—"}
-            </div>
-          </div>
-          <div className="rate-card primary flex-1 border-[1.5px] border-blue bg-blue-tint-2 rounded-[14px] p-3.5">
-            <div className="rlbl text-[12px] text-ink-3 font-semibold">
-              {lang === "ta" ? "மாதாந்திர · தங்குதல்" : "Monthly · live-in"}
-            </div>
-            <div className="rval text-[21px] font-extrabold text-ink mt-1 tracking-tight">
-              {cg.monthlyRate ? `₹${cg.monthlyRate.toLocaleString()}` : "—"}
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* 2. SUB-TABS: About / Verification / Timeline */}
+      <ProfileTabs
+        caregiver={cg}
+        canSeeDetails={canSeeDetails}
+        isVerified={isVerified}
+        verifiedAt={verifiedAt}
+        lang={lang}
+      />
 
       {/* 5. STICKY CTA ACTION BAR (Bottom Floating) */}
       {!isOwnProfile && (
