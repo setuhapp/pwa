@@ -58,19 +58,15 @@ export function NavigationShim({
       {!hideTopNav && (
         <header className="fixed left-0 right-0 top-0 z-50 flex h-16 items-center justify-between bg-blue text-white px-4 shadow-sm select-none">
           {/* Left: Back Button or spacer */}
-          <div className="flex w-10 items-center justify-start flex-shrink-0">
+          <div className="flex w-12 items-center justify-start z-10">
             {showBackButton && (
               <button
-                onClick={() => {
-                  if (canGoBack) router.back();
-                  else router.push(userType === "caregiver" ? "/caregiver" : "/browse");
-                }}
-                className="flex h-[38px] w-[38px] items-center justify-center rounded-xl bg-white/12 text-white border-none cursor-pointer transition-all active:scale-90 hover:bg-white/20"
+                onClick={() => router.back()}
+                className="flex h-10 w-10 items-center justify-center rounded-xl hover:bg-white/10 active:scale-90 transition-all cursor-pointer"
                 aria-label="Back"
               >
                 <svg
-                  width="18"
-                  height="18"
+                  className="h-6 w-6"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -85,12 +81,14 @@ export function NavigationShim({
           </div>
 
           {/* Center: Title Link (Centered Absolutely to Viewport) */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-            <Link href="/" className="flex items-center gap-1.5 text-base font-extrabold tracking-tight text-white hover:opacity-90 active:scale-95 transition-all select-none">
-              <img src="/logo.png" alt="" className="h-8 w-8 object-contain rounded-lg bg-white p-0.5" />
-              <span>SETUH</span>
-            </Link>
-          </div>
+          {pathname !== "/" && (
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+              <Link href="/" className="flex items-center gap-1.5 text-base font-extrabold tracking-tight text-white hover:opacity-90 active:scale-95 transition-all select-none">
+                <img src="/logo.png" alt="" className="h-8 w-8 object-contain rounded-lg bg-white p-0.5" />
+                <span>SETUH</span>
+              </Link>
+            </div>
+          )}
           
           {/* Right: Actions */}
           <div className="flex items-center gap-1.5 justify-end flex-shrink-0">
