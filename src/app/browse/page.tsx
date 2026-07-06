@@ -71,7 +71,7 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
   return (
     <main className="relative mx-auto flex max-w-md w-full flex-col bg-slate-50 pb-24">
       {/* Dark Hero Background */}
-      <div className="absolute inset-x-0 top-0 h-[340px] bg-gradient-to-b from-blue-950 via-blue-900 to-slate-50 rounded-b-[3rem] shadow-sm" />
+      <div className="absolute inset-x-0 top-0 h-[340px] bg-gradient-to-b from-blue-dark via-blue to-slate-50 rounded-b-[3rem] shadow-sm" />
 
       <div className="relative z-10 flex flex-col gap-6 p-6 pt-12">
         <div className="mb-2 text-center text-white drop-shadow-md">
@@ -136,7 +136,7 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
             </div>
           </div>
 
-          <button type="submit" className="mt-2 w-full rounded-xl bg-blue-600 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/20 transition-all duration-300 hover:bg-blue-700 hover:shadow-blue-600/40 active:scale-[0.98]">
+          <button type="submit" className="mt-2 w-full rounded-xl bg-blue py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-900/20 transition-all duration-300 hover:bg-blue-dark active:scale-[0.98]">
             {t.filter_apply}
           </button>
         </form>

@@ -111,16 +111,24 @@ export function CaregiverProfilePreview({
         {/* Quick Stats Grid */}
         <div className="phero-stats flex mt-5 bg-white/10 rounded-2xl p-1 select-none">
           <div className="phstat flex-1 text-center py-2.5 relative border-r border-white/15">
-            <div className="num text-[19px] font-extrabold tracking-tight text-white">
-              {cg.priorFamilies ? cg.priorFamilies.replace(/\D/g, "") || "3" : "3"}
+            <div className="num text-[17px] font-extrabold tracking-tight text-white">
+              {cg.experienceYears != null ? `${cg.experienceYears} ${lang === "ta" ? "ஆண்டுகள்" : "Yrs"}` : "—"}
+            </div>
+            <div className="lbl text-[11px] text-white/70 mt-0.5 font-semibold">
+              {lang === "ta" ? "அனுபவம்" : "Experience"}
+            </div>
+          </div>
+          <div className="phstat flex-1 text-center py-2.5 relative border-r border-white/15">
+            <div className="num text-[17px] font-extrabold tracking-tight text-white truncate max-w-full px-1">
+              {cg.priorFamilies ? cg.priorFamilies : "—"}
             </div>
             <div className="lbl text-[11px] text-white/70 mt-0.5 font-semibold">
               {lang === "ta" ? "குடும்பங்கள்" : "Families served"}
             </div>
           </div>
           <div className="phstat flex-1 text-center py-2.5">
-            <div className="num text-[19px] font-extrabold tracking-tight text-white truncate max-w-full px-1 capitalize">
-              {cg.availability === "live-in" ? (lang === "ta" ? "தங்குபவர்" : "Live-in") : cg.availability === "part-time" ? (lang === "ta" ? "பகுதி" : "Part-time") : (cg.availability || "Not Available")}
+            <div className="num text-[17px] font-extrabold tracking-tight text-white truncate max-w-full px-1 capitalize">
+              {cg.availability === "live-in" ? (lang === "ta" ? "தங்குபவர்" : "Live-in") : cg.availability === "part-time" ? (lang === "ta" ? "பகுதி" : "Part-time") : (cg.availability || "—")}
             </div>
             <div className="lbl text-[11px] text-white/70 mt-0.5 font-semibold">
               {lang === "ta" ? "நேரவிருப்பம்" : "Availability"}
@@ -198,7 +206,7 @@ export function CaregiverProfilePreview({
           ) : (
             <Link 
               href={!isLoggedIn ? "/login?role=member" : "/member/subscribe"}
-              className="btn-call flex-1 py-3.5 px-4 rounded-2xl bg-blue text-white border-none text-base font-bold flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.98] hover:bg-blue-dark shadow-md"
+              className="btn-call flex-1 py-4 px-4 rounded-2xl bg-gradient-to-r from-[#dca334] to-[#c29d53] text-white border-none text-base font-extrabold flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.98] hover:brightness-105 shadow-lg shadow-amber-600/30 text-shadow-sm"
             >
               🔒 {t.subscribe_btn}
             </Link>

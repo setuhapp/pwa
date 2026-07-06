@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 export function InstallPrompt() {
   const [isStandalone, setIsStandalone] = useState(true); // default true to avoid flash
   const [showPrompt, setShowPrompt] = useState(false);
-  const [browserInfo, setBrowserInfo] = useState({ isMobile: false, isSafari: false, isChromeOrEdge: false });
+  const [browserInfo, setBrowserInfo] = useState({ isMobile: false, isIos: false, isSafari: false, isChromeOrEdge: false });
 
   useEffect(() => {
     // Capture the native Android/Chrome install prompt
@@ -42,11 +42,13 @@ export function InstallPrompt() {
     // Detect browser/device info
     const ua = window.navigator.userAgent.toLowerCase();
     const isMobileDevice = /iphone|ipad|ipod|android/.test(ua);
+    const isIosDevice = /iphone|ipad|ipod/.test(ua);
     const isSafariBrowser = ua.includes("safari") && !ua.includes("chrome") && !ua.includes("android");
     const isChromeOrEdgeBrowser = ua.includes("chrome") || ua.includes("edg") || ua.includes("chromium");
 
     setBrowserInfo({
       isMobile: isMobileDevice,
+      isIos: isIosDevice,
       isSafari: isSafariBrowser,
       isChromeOrEdge: isChromeOrEdgeBrowser,
     });
@@ -76,7 +78,9 @@ export function InstallPrompt() {
 
   // Determine message to display based on device type
   let installInstruction = "Check the Home screen after clicking the \"Install App button \".";
-  if (!browserInfo.isMobile) {
+  if (browserInfo.isIos) {
+    installInstruction = "Tap the Share button (📤) at the bottom, then select \"Add to Home Screen\".";
+  } else if (!browserInfo.isMobile) {
     if (browserInfo.isSafari) {
       installInstruction = "To install on Mac: Go to File > Add to Dock in Safari's top menu.";
     } else if (browserInfo.isChromeOrEdge) {

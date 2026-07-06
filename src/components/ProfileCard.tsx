@@ -89,7 +89,7 @@ export function ProfileCard({ caregiver, lang = "en" }: { caregiver: PublicCareg
 
         {/* Action Button */}
         <div className="mt-5">
-          <Link href={`/c/${caregiver.id}`} className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-950 py-4 text-sm font-bold text-white shadow-lg shadow-blue-900/20 transition-all duration-300 hover:bg-blue-900 active:scale-[0.98]">
+          <Link href={`/c/${caregiver.id}`} className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-blue py-4 text-sm font-bold text-white shadow-lg shadow-blue-900/20 transition-all duration-300 hover:bg-blue-dark active:scale-[0.98]">
             {lang === "ta" ? "முழு சுயவிவரம் காண்க" : "View Full Profile"}
             <svg className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
           </Link>

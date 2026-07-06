@@ -32,22 +32,13 @@ export function NavigationShim({
       window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as any).standalone === true;
     setIsStandalone(standalone);
-
-    // Enforce PWA-only access for browsing, login, settings, and caregivers profile
-    if (!standalone) {
-      const blockedPaths = ["/browse", "/login", "/member", "/caregiver", "/c/"];
-      if (blockedPaths.some(p => pathname === p || pathname.startsWith(p))) {
-        router.replace("/");
-      }
-    }
-  }, [pathname, router]);
+  }, [pathname]);
 
   // Pages where we don't want the bottom nav to save screen space
   const hideBottomNav =
     userType === "admin" ||
     pathname === "/login" ||
-    pathname.startsWith("/caregiver/onboarding") ||
-    (pathname === "/" && !isStandalone);
+    pathname.startsWith("/caregiver/onboarding");
 
   // Pages where we don't want the top nav (because they have large desktop headers or are admin panels)
   const hideTopNav = pathname.startsWith("/admin");
@@ -96,7 +87,7 @@ export function NavigationShim({
           {/* Center: Title Link (Centered Absolutely to Viewport) */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
             <Link href="/" className="flex items-center gap-1.5 text-base font-extrabold tracking-tight text-white hover:opacity-90 active:scale-95 transition-all select-none">
-              <img src="/logo.png" alt="" className="h-[22px] w-[22px] object-contain rounded-md bg-white p-0.5" />
+              <img src="/logo.png" alt="" className="h-8 w-8 object-contain rounded-lg bg-white p-0.5" />
               <span>SETUH</span>
             </Link>
           </div>

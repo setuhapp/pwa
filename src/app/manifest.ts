@@ -14,7 +14,7 @@ export default function manifest(): MetadataRoute.Manifest {
     dir: "ltr",
     categories: ["health", "medical", "lifestyle"],
     background_color: "#f6f8f8",
-    theme_color: "#0f2b5c",
+    theme_color: "#0b2545",
     icons: [
       {
         src: "/icon-192.png",

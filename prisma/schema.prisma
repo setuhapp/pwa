@@ -40,6 +40,8 @@ model Caregiver {
 model Member {
   id                 String   @id @default(cuid())
   phone              String   @unique
+  email              String?  @unique
+  passwordHash       String?
   name               String?
   subscriptionStatus String   @default("none") // none | active
   subscriptionExpiry DateTime?

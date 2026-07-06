@@ -56,7 +56,7 @@ export default async function SubscribePage() {
           <div className="flex flex-col gap-3 w-full mt-6">
             <Link 
               href="/member/subscribe"
-              className="flex w-full items-center justify-center rounded-2xl bg-blue px-4 py-4 text-sm font-bold text-white shadow-lg shadow-blue/20 transition-transform active:scale-[0.98] hover:bg-blue-dark"
+              className="flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-[#dca334] to-[#c29d53] px-4 py-4 text-sm font-extrabold text-white shadow-lg shadow-amber-600/30 transition-transform active:scale-[0.98] hover:brightness-105"
             >
               🔄 {lang === "ta" ? "நிலையை புதுப்பிக்கவும்" : "Refresh Activation Status"}
             </Link>
@@ -110,7 +110,7 @@ export default async function SubscribePage() {
             <form action={subscribeMember} className="mt-5">
               <button 
                 type="submit" 
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue px-4 py-4 text-base font-bold text-white shadow-lg shadow-blue/20 transition-transform active:scale-[0.98] hover:bg-blue-dark"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#dca334] to-[#c29d53] px-4 py-4 text-base font-extrabold text-white shadow-lg shadow-amber-600/30 transition-transform active:scale-[0.98] hover:brightness-105 cursor-pointer"
               >
                 {lang === "ta" ? "கட்டணம் அனுப்பி குழுசேர்" : "Send Payment & Subscribe"}
               </button>
